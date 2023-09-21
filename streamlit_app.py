@@ -8,9 +8,11 @@ from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
+import components.authenticate as authenticate
+
+
 
 OPENAI_API_KEY = "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"
-
 
 def get_pdf_text(pdf_docs):
     text = ""
@@ -57,8 +59,6 @@ def get_conversation_chain(vectorstore):
 
 
 def main():
-    st.set_page_config(page_title="Webbie!", page_icon=":books:")
-    st.header("Webbie! :books:")
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
@@ -102,4 +102,23 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+
+    st.set_page_config(page_title="Webbie!", page_icon=":books:")
+    st.header("Webbie! :books:")
+
+    # Check authentication
+    authenticate.set_st_state_vars()
+
+    # Add login/logout buttons
+    if st.session_state["authenticated"]:
+        authenticate.button_logout()
+    else:
+        authenticate.button_login()
+
+
+    if (
+        st.session_state["authenticated"]
+    ):
+        main()
+    else:
+        st.write("Please login!")

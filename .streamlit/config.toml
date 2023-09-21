@@ -40,7 +40,7 @@ enableCORS = true
 
 [browser]
 
-serverAddress = "0.0.0.0"
+serverAddress = "localhost"
 
 gatherUsageStats = true
 
