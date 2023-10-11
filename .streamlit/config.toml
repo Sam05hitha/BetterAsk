@@ -40,7 +40,7 @@ enableCORS = true
 
 [browser]
 
-serverAddress = "localhost"
+serverAddress = "https://betterask.app/"
 
 gatherUsageStats = true
 
