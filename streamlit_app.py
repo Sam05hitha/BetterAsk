@@ -32,8 +32,6 @@ def get_text_chunks(raw_text):
 
 def get_vectorstore(text_chunks):
     embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-    # embeddings = HuggingFaceInstructEmbeddings(
-    #     model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
 
     return vectorstore
@@ -101,8 +99,8 @@ def main():
 
 if __name__ == "__main__":
 
-    st.set_page_config(page_title="Webbie!", page_icon=":books:")
-    st.header("Webbie! :books:")
+    st.set_page_config(page_title="BetterAsk!", page_icon=":books:")
+    st.header("BetterAsk! :books:")
 
     # Check authentication
     authenticate.set_st_state_vars()
