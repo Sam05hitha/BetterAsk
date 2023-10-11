@@ -104,4 +104,19 @@ if __name__ == "__main__":
     st.set_page_config(page_title="Webbie!", page_icon=":books:")
     st.header("Webbie! :books:")
 
-    main()
+    # Check authentication
+    authenticate.set_st_state_vars()
+
+    # Add login/logout buttons
+    if st.session_state["authenticated"]:
+        authenticate.button_logout()
+    else:
+        authenticate.button_login()
+
+
+    if (
+        st.session_state["authenticated"]
+    ):
+        main()
+    else:
+        st.write("Please login!")
