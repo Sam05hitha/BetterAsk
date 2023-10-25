@@ -1,0 +1,14 @@
+.login_input {
+   width: 100%;
+   padding: 16px 13px;
+   margin-bottom: 24px;
+   border-radius: 10px;
+
+   &::placeholder {
+      font-weight: 400;
+   }
+}
+
+.login_input:focus {
+   outline: none;
+}

@@ -1,0 +1,16 @@
+%flex-center {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
+
+.login_container {
+  min-height: 100vh;
+  @extend %flex-center;
+}
+.login_form {
+   margin-top: 65px;
+   width: 390px;
+   @extend %flex-center;
+}
