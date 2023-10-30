@@ -54,7 +54,7 @@ export default function LoginForm({
           show={input.isError}
         />
       </div>
-      <Button variant="filled" size="button_full" color="primary" type="submit">
+      <Button variant="filled" size="bfull" color="primary" type="submit">
         {login ? "Log In" : "Sign Up"}
       </Button>
       <div className="flex items-start w-full mt-6">

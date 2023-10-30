@@ -1,0 +1,37 @@
+%flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home_container {
+  min-height: 100%;
+  flex-direction: column;
+  @extend %flex-center;
+  min-height: calc(100vh - 80px);
+  position: relative;
+}
+
+.home_spaces {
+  margin: 90px;
+  flex-direction: column;
+  @extend %flex-center;
+
+  > div {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+
+    button {
+      padding: 10px 15px;
+      font-size: 20px;
+      border: 1px solid black;
+    }
+  }
+}
+
+.home_bgImage {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}

@@ -1,8 +1,9 @@
 .button_main {
   border-radius: 10px;
-  padding: 15px 0;
-  filter: drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.25)); 
+  padding: 15px;
+  filter: drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.25));
   transition: filter 0.3s linear;
+  font-weight: 500;
   
   &:hover {
     filter: brightness(110%) drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.25));
@@ -13,6 +14,26 @@
   }
 }
 
-.button_full {
+.bfull {
   width: 100%;
+}
+
+.bmedium {
+  padding: 10px;
+  width: 110px;
+}
+
+.bwide {
+  padding: 10px;
+}
+
+.button_outlined {
+  border: 1px solid black;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }

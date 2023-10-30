@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Inria_Sans, Geo } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "./_components";
 
 const inter = Inter({ subsets: ["latin"] });
 const inria = Inria_Sans({
@@ -21,12 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-      <html lang="en">
-        <body
-          className={`${inter.className} ${inria.variable} ${geo.variable}`}
-        >
-          {children}
-        </body>
-      </html>
+    <html lang="en">
+      <body className={`${inter.className} ${inria.variable} ${geo.variable}`}>
+        <Navbar />
+        {children}
+      </body>
+    </html>
   );
 }
