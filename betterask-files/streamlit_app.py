@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, HTTPException
+from fastapi import FastAPI, UploadFile, HTTPException, File
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
@@ -9,6 +9,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 import components.authenticate as authenticate
+from typing import List  # Import List
 
 OPENAI_API_KEY = "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"
 app = FastAPI()
@@ -24,19 +25,43 @@ global_chat_session = ChatSession()
 
 def get_pdf_text(pdf_file: UploadFile):
     # Code to read text from PDF
-    pass
+    text = ""
+    for pdf in pdf_file:
+        pdf_reader = PdfReader(pdf)
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+
+    return text
 
 def get_text_chunks(raw_text):
     # Code to split the text into chunks
-    pass
+    text_splitter = CharacterTextSplitter(
+        separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len
+    )
+    chunks = text_splitter.split_text(raw_text)
+    return chunks
 
 def get_vectorstore(text_chunks):
     # Code to get the vectorstore
-    pass
+    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    return vectorstore
 
 def get_conversation_chain(vectorstore):
     # Code to get the conversation chain
-    pass
+    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
+    memory = ConversationBufferMemory(
+        memory_key='chat_history',
+        return_messages=True
+    )
+
+    conversation_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=vectorstore.as_retriever(),
+        memory=memory
+    )
+
+    return conversation_chain
 
 @app.post("/chat/{query}")
 async def chat(query: str):
