@@ -74,8 +74,20 @@ async def chat(query: str):
 
 @app.post("/process-documents")
 async def process_documents(pdf_files: List[UploadFile] = File(...)):
-    raw_text = get_pdf_text(pdf_files)
-    text_chunks = get_text_chunks(raw_text)
-    vectorstore = get_vectorstore(text_chunks)
-    global_chat_session.conversation = get_conversation_chain(vectorstore)
+
+    for file in pdf_files:
+        try:
+            contents = file.file.read()
+            with open(file.filename, 'wb') as f:
+                f.write(contents)
+        except Exception:
+            return {"message": "There was an error uploading the file(s)"}
+        finally:
+            file.file.close()
+
+    # raw_text = get_pdf_text(pdf_files)
+    # text_chunks = get_text_chunks(raw_text)
+    # vectorstore = get_vectorstore(text_chunks)
+    # global_chat_session.conversation = get_conversation_chain(vectorstore)
+
     return {"message": "Documents processed. Start asking questions using /chat/<query>"}
