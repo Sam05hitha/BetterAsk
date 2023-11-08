@@ -10,6 +10,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 import components.authenticate as authenticate
 from typing import List  # Import List
+import io
 
 OPENAI_API_KEY = "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"
 app = FastAPI()
@@ -23,11 +24,12 @@ class ChatSession:
 # Replace with a suitable data structure (like a dict) for multiple sessions
 global_chat_session = ChatSession()
 
-def get_pdf_text(pdf_file: UploadFile):
+def get_pdf_text(pdf_files: UploadFile):
     # Code to read text from PDF
     text = ""
-    for pdf in pdf_file:
-        pdf_reader = PdfReader(pdf)
+    for pdf_file in pdf_files:
+        pdf_bytes = io.BytesIO(pdf_file.file.read())
+        pdf_reader = PdfReader(pdf_bytes)
         for page in pdf_reader.pages:
             text += page.extract_text()
 
@@ -63,6 +65,13 @@ def get_conversation_chain(vectorstore):
 
     return conversation_chain
 
+@app.post("/get-conversation-chain")
+async def get_conversational_chain():
+    print(global_chat_session.conversation)
+    if global_chat_session.conversation is None:
+        raise HTTPException(status_code=400, detail="No documents processed yet")
+    # return {"message": global_chat_session}
+
 @app.post("/chat/{query}")
 async def chat(query: str):
     if global_chat_session.conversation is None:
@@ -74,20 +83,9 @@ async def chat(query: str):
 
 @app.post("/process-documents")
 async def process_documents(pdf_files: List[UploadFile] = File(...)):
-
-    for file in pdf_files:
-        try:
-            contents = file.file.read()
-            with open(file.filename, 'wb') as f:
-                f.write(contents)
-        except Exception:
-            return {"message": "There was an error uploading the file(s)"}
-        finally:
-            file.file.close()
-
-    # raw_text = get_pdf_text(pdf_files)
-    # text_chunks = get_text_chunks(raw_text)
-    # vectorstore = get_vectorstore(text_chunks)
-    # global_chat_session.conversation = get_conversation_chain(vectorstore)
+    raw_text = get_pdf_text(pdf_files)
+    text_chunks = get_text_chunks(raw_text)
+    vectorstore = get_vectorstore(text_chunks)
+    global_chat_session.conversation = get_conversation_chain(vectorstore)
 
     return {"message": "Documents processed. Start asking questions using /chat/<query>"}
