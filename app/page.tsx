@@ -8,9 +8,9 @@ import Image from "next/image";
 import Hbg from "../public/home-bg.svg";
 
 const topSpaces = [
-  { title: "Salary and Finance" },
-  { title: "Human Resource" },
-  { title: "Code of conduct" },
+  { title: "Salary and Finance", to: "space/1" },
+  { title: "Human Resource", to: "space/2" },
+  { title: "Code of conduct", to: "space/3" },
 ];
 
 export default function Home() {
@@ -31,12 +31,12 @@ export default function Home() {
         <div>
           {topSpaces.map((item) => (
             <Button
-              custom="text-black font-geo"
               key={item.title}
               size="bwide"
               color="white"
-              onClick={handleToSpaces("")}
+              onClick={handleToSpaces(item.to)}
               variant="filled"
+              custom="text-text font-geo"
             >
               {item.title}
             </Button>

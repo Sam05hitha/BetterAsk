@@ -1,0 +1,23 @@
+.chatTabItem_item {
+  display: flex;
+  padding: 10px 15px;
+  align-items: center;
+
+  .chatTabItem_item_icon {
+    font-size: 20px;
+  }
+
+  span {
+    margin-left: 15px;
+    font-size: 15px;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.chatActionTabs_button {
+  font-size: 24px;
+  padding: 10px 0;
+}

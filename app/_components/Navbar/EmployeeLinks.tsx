@@ -4,13 +4,9 @@ import style from "./navbar.module.scss";
 import { usePathname } from "next/navigation";
 import NavProfile from "./NavProfile";
 
-const links = [
-  { title: "Manage spaces", to: "Manage_spaces" },
-  { title: "Manage documents", to: "/Manage_documents" },
-  { title: "Manage users", to: "/manage_users" },
-];
+const links = [{ title: "View spaces", to: "View_spaces" }];
 
-export default function SmLinks() {
+export default function EmployeeLinks() {
   const pathname = usePathname();
 
   return (
@@ -20,7 +16,7 @@ export default function SmLinks() {
           {item.title}
         </Link>
       ))}
-      <NavProfile username="Thomas Ed." role="space manager" />
+      <NavProfile username="Thomas Ed." role="Space user" />
     </div>
   );
 }
