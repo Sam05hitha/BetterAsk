@@ -9,7 +9,7 @@ type TSpaceHeading = {
 
 export default function SpaceHeading({ title, link }: TSpaceHeading) {
   return (
-    <div className={style.space_heading}>
+    <div className={`${style.space_heading} font-geo`}>
       <h3>{title}</h3>
       <Link href={link} className=" text-text-100 underline">
         View documents

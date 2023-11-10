@@ -4,19 +4,20 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 interface IMessage {
   isUser: boolean;
+  data: { text: string; time: string };
 }
 
-export default function Message({ isUser }: IMessage) {
+export default function Message({ isUser, data }: IMessage) {
   return (
     <div className={`${style.message_container} font-geo`}>
       <div className={style.message_time}>
-        <span>14:30</span>
+        <span>{data.time}</span>
       </div>
       <div className={style.message_body}>
         <div className={style.message_avatar}>
           <AccountCircleIcon />
         </div>
-        <p className={style.message_text}>What is this document about ?</p>
+        <p className={style.message_text}>{data.text}</p>
       </div>
     </div>
   );

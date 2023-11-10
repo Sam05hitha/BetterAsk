@@ -1,8 +1,12 @@
 .chatAction_container {
   padding: 10px;
   width: 250px;
-  min-height: calc(100vh - 140px);
+  height: calc(100vh - 140px);
+  max-height: calc(100vh - 140px);
   border-radius: 10px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 30px;
 }
 
 .chatAction_top_buttons {
@@ -10,7 +14,6 @@
 }
 
 .chatAction_recent {
-  margin-top: 50px;
-  margin-bottom: 50px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
-

@@ -47,7 +47,7 @@ export default function Home() {
         </Link>
       </div>
       <div className={style.home_bgImage}>
-        <Image src={Hbg} alt="" />
+        <Image src={Hbg} priority alt="" />
       </div>
     </main>
   );

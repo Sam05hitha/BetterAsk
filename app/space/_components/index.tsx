@@ -6,3 +6,4 @@ export { default as ChatActionButtons } from "./(components)/ChatActionButtons";
 export { default as SpaceHeading } from "./(components)/SpaceHeading";
 export { default as ChatInput } from "./(components)/ChatInput";
 export { default as Message } from "./(components)/Message";
+export { default as ChatContainer } from "./(components)/ChatContainer";

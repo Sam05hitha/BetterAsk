@@ -14,7 +14,10 @@ export default function ChatInput({
   handleOnChange,
 }: TChatInput) {
   return (
-    <form className={style.space_page_chat_input} onSubmit={handleOnSubmit}>
+    <form
+      className={`${style.space_page_chat_input} bg-secondary-100`}
+      onSubmit={handleOnSubmit}
+    >
       <div>
         <input
           placeholder="Enter your message here"
@@ -22,7 +25,9 @@ export default function ChatInput({
           onChange={handleOnChange}
         />
         <button type="submit" className={style.space_send_button}>
-          <Image src={SendIcon} alt="send message" />
+          <div>
+            <Image objectFit="cover" src={SendIcon} alt="send message" />
+          </div>
         </button>
       </div>
     </form>

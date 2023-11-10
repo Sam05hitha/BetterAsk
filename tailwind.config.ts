@@ -19,7 +19,7 @@ const config: Config = {
         primary: "#718DF0",
         "primary-100": "#6D8DFFC2",
         secondary: "#FAFBFD",
-        "secondary-100": "#C5D2FF24",
+        "secondary-100": "#f5f7ff",
         "secondary-200": "#C5D2FFEB",
         page: "#FFFFFF",
         "page-100": "#D9D9D942",
