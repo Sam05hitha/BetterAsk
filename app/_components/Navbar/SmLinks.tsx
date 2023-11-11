@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import NavProfile from "./NavProfile";
 
 const links = [
-  { title: "Manage spaces", to: "Manage_spaces" },
+  { title: "Manage spaces", to: "/spaces" },
   { title: "Manage documents", to: "/Manage_documents" },
   { title: "Manage users", to: "/manage_users" },
 ];

@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, Inria_Sans, Geo } from "next/font/google";
+import { Geologica } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./_components";
 
-const inter = Inter({ subsets: ["latin"] });
-const inria = Inria_Sans({
-  weight: "700",
+const geo = Geologica({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-inria",
+  variable: "--font-geo",
 });
-const geo = Geo({ weight: "400", subsets: ["latin"], variable: "--font-geo" });
+
+const geoMedium = Geologica({
+  weight: "500",
+  subsets: ["latin"],
+  variable: "--font-medium",
+});
+
+const geoBold = Geologica({
+  weight: "800",
+  subsets: ["latin"],
+  variable: "--font-bold",
+});
 
 export const metadata: Metadata = {
   title: "BetterAsk",
@@ -23,7 +33,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${inria.variable} ${geo.variable}`}>
+      <body
+        className={`${geo.className} ${geoBold.variable} ${geoMedium.variable}`}
+      >
         <Navbar />
         {children}
       </body>

@@ -2,8 +2,9 @@
 
 import React from "react";
 import style from "../_styles/chatAction.module.scss";
-import { ChatActionButtons, Recent, TopSpaces } from "..";
+import { Recent, TopSpaces } from "..";
 import { useRouter } from "next/navigation";
+import { ActionButtons } from "@/app/_components";
 
 export default function ChatAction() {
   const router = useRouter();
@@ -17,7 +18,8 @@ export default function ChatAction() {
 
   return (
     <div className={`${style.chatAction_container} bg-secondary-100`}>
-      <ChatActionButtons
+      <ActionButtons
+        custom={["w-[180px] ", "w-[50px] h-[50px]"]}
         handleCreateSpace={handleCreateSpace}
         handleGoBack={handleGoBack}
       />

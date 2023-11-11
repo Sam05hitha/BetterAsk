@@ -1,0 +1,21 @@
+.table_container {
+  margin-top: 20px;
+  min-height: calc(100vh - 210px);
+  border-radius: 10px;
+}
+
+.no_space_container {
+  @extend .table_container;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table_no_space {
+  font-size: 23px;
+}
+
+.table_main {
+  width: 100%;
+  border: 1px solid red;
+}
