@@ -6,3 +6,4 @@ export { default as Navbar } from "./Navbar/Navbar";
 export { default as PageHeadingTab } from "./PageHeadingTab/PageHeadingTab";
 export { default as ActionButtons } from "./ActionButtons/ActionButtons";
 export { default as Table } from "./Table/Table";
+export { default as TableButtonGroup } from "./Table/TableButtonGroup";
