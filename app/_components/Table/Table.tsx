@@ -45,7 +45,7 @@ export default function Table({
                     <td className={style.table_overflow_ellipses}>
                       {item.title}
                     </td>
-                    {documents && (
+                    {(documents || users) && (
                       <td
                         className={`${style.table_center} ${style.table_overflow_ellipses}`}
                       >
