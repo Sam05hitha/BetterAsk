@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React from "react";
 import style from "./table.module.scss";
@@ -27,7 +27,7 @@ export default function Table({
         <>
           <div className={`${style.table_container} font-geo bg-secondary`}>
             <table className={style.table_main}>
-              <thead className="bg-primary-100">
+              <thead className="bg-secondary-200">
                 <tr>
                   {config.heads.map((item, index) => (
                     <th
@@ -43,8 +43,15 @@ export default function Table({
                 {data.map((item) => (
                   <tr>
                     <td className={style.table_overflow_ellipses}>
-                      Salary and Finance
+                      {item.title}
                     </td>
+                    {documents && (
+                      <td
+                        className={`${style.table_center} ${style.table_overflow_ellipses}`}
+                      >
+                        Human Resources
+                      </td>
+                    )}
                     <td>
                       <TableButtonGroup
                         onChat={() => {}}

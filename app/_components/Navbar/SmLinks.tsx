@@ -6,7 +6,7 @@ import NavProfile from "./NavProfile";
 
 const links = [
   { title: "Manage spaces", to: "/spaces" },
-  { title: "Manage documents", to: "/Manage_documents" },
+  { title: "Manage documents", to: "/manage_documents" },
   { title: "Manage users", to: "/manage_users" },
 ];
 

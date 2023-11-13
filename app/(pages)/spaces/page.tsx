@@ -1,6 +1,6 @@
 import React from "react";
-import style from "./spaces.module.scss";
-import { PageHeadingTab, Table } from "../_components";
+import style from "../../main.module.scss";
+import { PageHeadingTab, Table } from "../../_components";
 
 const data = [
   { id: "1", title: "Salary and Finance" },
@@ -9,7 +9,7 @@ const data = [
 
 export default function page() {
   return (
-    <section className={style.spaces_page_container}>
+    <section className={style.main_page_common_container}>
       <PageHeadingTab spaces title="Spaces" />
       <Table
         spaces
