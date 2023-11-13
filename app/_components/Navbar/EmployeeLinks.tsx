@@ -4,7 +4,7 @@ import style from "./navbar.module.scss";
 import { usePathname } from "next/navigation";
 import NavProfile from "./NavProfile";
 
-const links = [{ title: "View spaces", to: "View_spaces" }];
+const links = [{ title: "View spaces", to: "/spaces" }];
 
 export default function EmployeeLinks() {
   const pathname = usePathname();

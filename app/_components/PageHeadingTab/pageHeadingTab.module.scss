@@ -1,0 +1,12 @@
+.pageHeading_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  padding: 10px 20px;
+
+  h2 {
+    font-size: 25px;
+    font-weight: 500;
+  }
+}

@@ -27,8 +27,9 @@ const config: Config = {
         "action-100": "#DD0202",
       },
       fontFamily: {
-        inria: "var(--font-inria)",
         geo: "var(--font-geo)",
+        bold: "var(-font-bold)",
+        medium: "var(--font-medium)",
       },
     },
     plugins: [],

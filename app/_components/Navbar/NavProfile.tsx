@@ -28,7 +28,7 @@ export default function NavProfile({ username, role }: TNavProfile) {
           <div>
             <ArrowLeftIcon className={`${style.arrow_up} text-white`} />
           </div>
-          <button onClick={handleOnLogOut}>Log Out</button>
+          <button className="text-[16px]" onClick={handleOnLogOut}>Log Out</button>
         </div>
       )}
     </div>
