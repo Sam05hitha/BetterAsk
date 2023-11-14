@@ -11,8 +11,14 @@ from langchain.chains import ConversationalRetrievalChain
 import components.authenticate as authenticate
 from typing import List  # Import List
 import io
+import os
 
-OPENAI_API_KEY = "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"
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the OpenAI API key from the environment variables
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 app = FastAPI()
 
 class ChatSession:
@@ -89,3 +95,8 @@ async def process_documents(pdf_files: List[UploadFile] = File(...)):
     global_chat_session.conversation = get_conversation_chain(vectorstore)
 
     return {"message": "Documents processed. Start asking questions using /chat/<query>"}
+
+if __name__ == "__main__":
+    import uvicorn
+    # Run the FastAPI application using Uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
