@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, HTTPException, File
+from fastapi import FastAPI, UploadFile, HTTPException, File, Depends
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
@@ -12,6 +12,9 @@ import components.authenticate as authenticate
 from typing import List  # Import List
 import io
 import os
+import psycopg2
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 
 # Load environment variables from .env file
 load_dotenv()
@@ -19,7 +22,36 @@ load_dotenv()
 # Retrieve the OpenAI API key from the environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# PostgreSQL connection settings
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Create a connection to the PostgreSQL database
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+# Create a cursor object to interact with the database
+cursor = conn.cursor()
+
+# FastAPI application
 app = FastAPI()
+
+# Enable CORS (Cross-Origin Resource Sharing)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (change this in production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+# Dependency to get the database cursor
+async def get_db_cursor():
+    db = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cursor = db.cursor()
+    try:
+        yield cursor
+    finally:
+        cursor.close()
+        db.close()
 
 class ChatSession:
     def __init__(self):
@@ -71,21 +103,47 @@ def get_conversation_chain(vectorstore):
 
     return conversation_chain
 
-@app.post("/get-conversation-chain")
-async def get_conversational_chain():
-    print(global_chat_session.conversation)
+@app.get("/get-conversation-chain/{conversation_id}")
+async def get_conversation_chain(conversation_id: int, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+    # Retrieve the conversation history from the database
+
     if global_chat_session.conversation is None:
         raise HTTPException(status_code=400, detail="No documents processed yet")
-    # return {"message": global_chat_session}
+
+    select_query = "SELECT user_query, assistant_response FROM conversation_history WHERE id = %s;"
+    cursor.execute(select_query, (conversation_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append({"role": "user", "content": row[0]})
+        conversation_chain.append({"role": "assistant", "content": row[1]})
+
+    return {"conversation_chain": conversation_chain}
 
 @app.post("/chat/{query}")
-async def chat(query: str):
+async def chat(query: str, conversation_id: int = None, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
     if global_chat_session.conversation is None:
         raise HTTPException(status_code=400, detail="No documents processed yet")
     response = global_chat_session.conversation({'question': query})
     global_chat_session.chat_history.append({"role": "user", "content": query})
     global_chat_session.chat_history.append({"role": "assistant", "content": response["answer"]})
-    return {"answer": response["answer"]}
+
+    # Insert the conversation into the database
+    insert_query = "INSERT INTO conversation_history (user_query, assistant_response) VALUES (%s, %s) RETURNING id;"
+    cursor.execute(insert_query, (query, response["answer"]))
+    conversation_id = cursor.fetchone()[0]
+    conn.commit()
+
+    if conversation_id is None:
+        insert_query = "INSERT INTO conversation_history (user_query, assistant_response) VALUES (%s, %s) RETURNING id;"
+        cursor.execute(insert_query, (query, response["answer"]))
+        conversation_id = cursor.fetchone()[0]
+        conn.commit()
+
+
+    return {"answer": response["answer"], "conversation_id": conversation_id}
 
 @app.post("/process-documents")
 async def process_documents(pdf_files: List[UploadFile] = File(...)):
