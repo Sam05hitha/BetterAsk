@@ -43,6 +43,23 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+class ChatSession:
+    def __init__(self):
+        self.conversation = None
+        self.chat_history = []
+
+    async def get_conversation(self, query):
+        if self.conversation is None:
+            raise HTTPException(status_code=400, detail="No documents processed yet")
+        return await self.conversation({'question': query})
+
+# A global chat session.
+# Replace with a suitable data structure (like a dict) for multiple sessions
+global_chat_session = ChatSession()
+
+def get_chat_session():
+    return ChatSession()
+
 # Dependency to get the database cursor
 async def get_db_cursor():
     db = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -52,15 +69,6 @@ async def get_db_cursor():
     finally:
         cursor.close()
         db.close()
-
-class ChatSession:
-    def __init__(self):
-        self.conversation = None
-        self.chat_history = []
-
-# A global chat session.
-# Replace with a suitable data structure (like a dict) for multiple sessions
-global_chat_session = ChatSession()
 
 def get_pdf_text(pdf_files: UploadFile):
     # Code to read text from PDF
@@ -111,6 +119,28 @@ async def get_conversation_chain(conversation_id: int, db: psycopg2.extensions.c
         raise HTTPException(status_code=400, detail="No documents processed yet")
 
     select_query = "SELECT user_query, assistant_response FROM conversation_history WHERE id = %s;"
+    await cursor.execute(select_query, (conversation_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append({"role": "user", "content": row[0]})
+        conversation_chain.append({"role": "assistant", "content": row[1]})
+
+    return await {"conversation_chain": conversation_chain}
+
+@app.post("/chat/{query}")
+async def chat(query: str, conversation_id: int = None, chat_session: ChatSession = Depends(get_chat_session)):
+    if conversation_id is None:
+        # If conversation_id is not provided, generate a new one
+        insert_query = "INSERT INTO conversation_history (user_query, assistant_response) VALUES (%s, %s) RETURNING id;"
+        cursor.execute(insert_query, (query, ""))
+        conversation_id = cursor.fetchone()[0]
+        conn.commit()
+
+    # Retrieve the conversation history from the database
+    select_query = "SELECT user_query, assistant_response FROM conversation_history WHERE id = %s;"
     cursor.execute(select_query, (conversation_id,))
     history = cursor.fetchall()
 
@@ -120,28 +150,13 @@ async def get_conversation_chain(conversation_id: int, db: psycopg2.extensions.c
         conversation_chain.append({"role": "user", "content": row[0]})
         conversation_chain.append({"role": "assistant", "content": row[1]})
 
-    return {"conversation_chain": conversation_chain}
+    # Call the get_conversation method of the chat session
+    response = await chat_session.get_conversation(query)
 
-@app.post("/chat/{query}")
-async def chat(query: str, conversation_id: int = None, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
-    if global_chat_session.conversation is None:
-        raise HTTPException(status_code=400, detail="No documents processed yet")
-    response = global_chat_session.conversation({'question': query})
-    global_chat_session.chat_history.append({"role": "user", "content": query})
-    global_chat_session.chat_history.append({"role": "assistant", "content": response["answer"]})
-
-    # Insert the conversation into the database
-    insert_query = "INSERT INTO conversation_history (user_query, assistant_response) VALUES (%s, %s) RETURNING id;"
-    cursor.execute(insert_query, (query, response["answer"]))
-    conversation_id = cursor.fetchone()[0]
+    # Insert the new response into the database
+    update_query = "UPDATE conversation_history SET assistant_response = %s WHERE id = %s;"
+    cursor.execute(update_query, (response["answer"], conversation_id))
     conn.commit()
-
-    if conversation_id is None:
-        insert_query = "INSERT INTO conversation_history (user_query, assistant_response) VALUES (%s, %s) RETURNING id;"
-        cursor.execute(insert_query, (query, response["answer"]))
-        conversation_id = cursor.fetchone()[0]
-        conn.commit()
-
 
     return {"answer": response["answer"], "conversation_id": conversation_id}
 
