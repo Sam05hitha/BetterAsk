@@ -12,13 +12,16 @@ export default function ChatAction() {
   function handleGoBack() {
     router.back();
   }
+
   function handleCreateSpace() {
-    //TODO: create space form
+    // TODO create new chat channel
+    router.push("/space/new_chat_model");
   }
 
   return (
     <div className={`${style.chatAction_container} bg-secondary-100`}>
       <ActionButtons
+        spaces
         custom={["w-[180px] ", "w-[50px] h-[50px]"]}
         handleCreateSpace={handleCreateSpace}
         handleGoBack={handleGoBack}

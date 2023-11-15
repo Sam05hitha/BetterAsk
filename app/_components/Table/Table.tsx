@@ -40,8 +40,8 @@ export default function Table({
                 </tr>
               </thead>
               <tbody>
-                {data.map((item) => (
-                  <tr>
+                {data.map((item, index) => (
+                  <tr key={index}>
                     <td className={style.table_overflow_ellipses}>
                       {item.title}
                     </td>

@@ -8,6 +8,15 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn test"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": ["eslint --fix", "git add"]
+  },  
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -26,9 +35,15 @@
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "13.5.6",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
     "postcss": "^8",
     "sass": "^1.69.4",
     "tailwindcss": "^3",
     "typescript": "^5"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/swa01wk/webbie.git",
+  "author": "Sanket-Abhtankar-webknot <sanket@webknot.in>",
+  "license": "MIT"
 }
