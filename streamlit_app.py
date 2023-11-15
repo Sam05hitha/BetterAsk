@@ -48,14 +48,14 @@ class ChatSession:
         self.conversation = None
         self.chat_history = []
 
-    async def get_conversation(self, query):
-        if self.conversation is None:
-            raise HTTPException(status_code=400, detail="No documents processed yet")
-        return await self.conversation({'question': query})
-
 # A global chat session.
 # Replace with a suitable data structure (like a dict) for multiple sessions
 global_chat_session = ChatSession()
+
+async def get_conversation(query):
+    if global_chat_session.conversation is None:
+        raise HTTPException(status_code=400, detail="No documents processed yet")
+    return global_chat_session.conversation({'question': query})
 
 def get_chat_session():
     return ChatSession()
@@ -109,17 +109,16 @@ def get_conversation_chain(vectorstore):
         memory=memory
     )
 
+    print(conversation_chain)
+
     return conversation_chain
 
-@app.get("/get-conversation-chain/{conversation_id}")
-async def get_conversation_chain(conversation_id: int, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+@app.get("/get-conversation-history/{conversation_id}")
+async def get_conversation_history(conversation_id: int, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
     # Retrieve the conversation history from the database
-
-    if global_chat_session.conversation is None:
-        raise HTTPException(status_code=400, detail="No documents processed yet")
-
+    
     select_query = "SELECT user_query, assistant_response FROM conversation_history WHERE id = %s;"
-    await cursor.execute(select_query, (conversation_id,))
+    cursor.execute(select_query, (conversation_id,))
     history = cursor.fetchall()
 
     # Reconstruct the conversation chain
@@ -128,7 +127,7 @@ async def get_conversation_chain(conversation_id: int, db: psycopg2.extensions.c
         conversation_chain.append({"role": "user", "content": row[0]})
         conversation_chain.append({"role": "assistant", "content": row[1]})
 
-    return await {"conversation_chain": conversation_chain}
+    return {"conversation_chain": conversation_chain}
 
 @app.post("/chat/{query}")
 async def chat(query: str, conversation_id: int = None, chat_session: ChatSession = Depends(get_chat_session)):
@@ -151,7 +150,7 @@ async def chat(query: str, conversation_id: int = None, chat_session: ChatSessio
         conversation_chain.append({"role": "assistant", "content": row[1]})
 
     # Call the get_conversation method of the chat session
-    response = await chat_session.get_conversation(query)
+    response = await get_conversation(query)
 
     # Insert the new response into the database
     update_query = "UPDATE conversation_history SET assistant_response = %s WHERE id = %s;"
@@ -162,9 +161,13 @@ async def chat(query: str, conversation_id: int = None, chat_session: ChatSessio
 
 @app.post("/process-documents")
 async def process_documents(pdf_files: List[UploadFile] = File(...)):
+
+    # Code to process the documents
     raw_text = get_pdf_text(pdf_files)
     text_chunks = get_text_chunks(raw_text)
     vectorstore = get_vectorstore(text_chunks)
+
+    # Set the global_chat_session.conversation after processing documents
     global_chat_session.conversation = get_conversation_chain(vectorstore)
 
     return {"message": "Documents processed. Start asking questions using /chat/<query>"}

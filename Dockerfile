@@ -11,6 +11,6 @@ RUN pip install -r req.txt
 # Bundle app source
 COPY . /app
 
-CMD [ "streamlit", "run", "streamlit_app.py" ]
+CMD [ "python", "streamlit_app.py" ]
 
-EXPOSE 8080
+EXPOSE 8000
