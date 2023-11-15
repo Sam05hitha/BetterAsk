@@ -1,0 +1,20 @@
+.create_space_footer_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Done
+.create_space_note {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  p {
+    margin-left: 10px;
+  }
+}
+
+.create_space_footer_button_group {
+  display: flex;
+  gap: 10px;
+}

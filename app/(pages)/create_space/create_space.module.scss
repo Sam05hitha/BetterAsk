@@ -1,0 +1,34 @@
+.create_space_page_container {
+  min-height: calc(100vh - 80px);
+  width: 100%;
+  padding: 20px 55px;
+  background-color: white;
+}
+
+.create_space_container_two {
+  border-radius: 10px;
+  padding: 20px;
+}
+
+// Done
+.create_space_name_container {
+  margin-bottom: 20px;
+
+  & > input {
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px black;
+    width: calc(50% - 5px);
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px black;
+    }
+  }
+}
+
+.create_space_uploads_container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}

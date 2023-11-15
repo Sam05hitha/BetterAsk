@@ -53,10 +53,10 @@ export default function TableButtonGroup({
   return (
     <div className={style.table_row_inner_container}>
       {buttonsConfig.map(
-        (item, index) =>
+        (item) =>
           item.visible && (
             <Button
-              key={index}
+              key={item.text}
               custom="h-[40px] w-[85px]"
               variant={item.variant}
               size="bsmall"
