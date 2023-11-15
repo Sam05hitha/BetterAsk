@@ -9,6 +9,11 @@
   top: 30px;
 }
 
+.no_navbar {
+  min-height: calc(100vh - 60px);
+  max-height: calc(100vh - 60px);
+}
+
 .chatAction_recent {
   margin-top: 20px;
   margin-bottom: 10px;

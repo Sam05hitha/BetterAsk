@@ -1,8 +1,8 @@
 .space_page_chat_input {
-  width: 100%;
+  width: calc(100% - 10px);
   position: sticky;
   position: -webkit-sticky;
-  bottom: 0;
+  top: 0;
   left: 0;
   display: flex;
   justify-content: center;

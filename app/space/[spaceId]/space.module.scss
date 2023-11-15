@@ -1,20 +1,5 @@
-.space_main_container {
-  background-color: white;
-  padding: 30px;
-  display: flex;
-}
-
-.space_page_outer_container {
-  width: 100%;
-  height: calc(100vh - 140px);
-  max-height: calc(100vh - 140px);
-  margin-left: 40px;
-  position: sticky;
-  border-radius: 10px;
-  position: -webkit-sticky;
-  top: 30px;
-  overflow-y: scroll;
-  scroll-behavior: smooth;
+%overflow {
+  overflow-y: auto;
 
   &::-webkit-scrollbar {
     width: 10px;
@@ -39,13 +24,41 @@
   }
 }
 
+%height {
+  min-height: calc(100vh - 210px);
+  max-height: calc(100vh - 210px);
+  scroll-behavior: smooth;
+}
+
+.space_main_container {
+  background-color: white;
+  padding: 30px;
+  display: flex;
+}
+
+.space_page_outer_container {
+  width: 100%;
+  @extend %height;
+  margin-left: 40px;
+  position: sticky;
+  border-radius: 10px;
+  position: -webkit-sticky;
+  top: 30px;
+}
+
 .space_page_container {
   display: block;
   width: 100%;
-
   min-height: 100%;
   position: relative;
   padding: 10px 45px 40px;
+  @extend %height;
+  @extend %overflow;
+}
+
+.no_navbar {
+  min-height: calc(100vh - 130px);
+  max-height: calc(100vh - 130px);
 }
 
 // spaceHeading.tsx

@@ -38,6 +38,10 @@
   @extend %scroll_style;
 }
 
+.no_navbar {
+  min-height: 100vh;
+}
+
 .list_item_container {
   width: 100%;
   background-color: transparent;

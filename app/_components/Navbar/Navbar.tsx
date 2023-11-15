@@ -28,7 +28,7 @@ export default function Navbar() {
         <header className="font-geo font-extrabold text-3xl">
           <Link href="/">BetterAsk</Link>
         </header>
-        <SmLinks />
+        {/* <SmLinks /> */}
         {/* <EmployeeLinks /> */}
         {/* <LogButtons handleSignIn={handleSignIn} /> */}
       </nav>

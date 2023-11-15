@@ -24,7 +24,7 @@ export default function Home() {
   }
 
   return (
-    <main className={`${style.home_container} bg-primary`}>
+    <main className={`${style.home_container} ${style.no_navbar} bg-primary`}>
       <h1 className="font-inria text-5xl ">BetterAsk</h1>
 
       <div className={style.home_spaces}>

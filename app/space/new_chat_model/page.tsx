@@ -18,13 +18,9 @@ export default function page({ params }: { params: { spaceId: string } }) {
   }
 
   return (
-    <div className={style.space_page_outer_container}>
-      <SpaceHeading title="space title" link="/" />
-      <section
-        className={`${style.space_page_container} bg-secondary-100 font-geo`}
-      >
-        <ChatContainer data={data} />
-      </section>
+    <div className={`${style.space_page_outer_container} ${style.no_navbar}`}>
+      {/* <SpaceHeading title="space title" link="/" /> */}
+      <ChatContainer data={data} />
       <ChatInput
         handleOnChange={handleOnChange}
         handleOnSubmit={handleOnSubmit}

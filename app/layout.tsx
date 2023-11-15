@@ -36,7 +36,7 @@ export default function RootLayout({
       <body
         className={`${geo.className} ${geoBold.variable} ${geoMedium.variable}`}
       >
-        <Navbar />
+        {/* <Navbar /> */}
         {children}
       </body>
     </html>

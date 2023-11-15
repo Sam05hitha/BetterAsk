@@ -19,10 +19,12 @@ export default function ChatAction() {
   }
 
   return (
-    <div className={`${style.chatAction_container} bg-secondary-100`}>
+    <div
+      className={`${style.chatAction_container} ${style.no_navbar} bg-secondary-100`}
+    >
       <ActionButtons
         spaces
-        custom={["w-[180px] ", "w-[50px] h-[50px]"]}
+        custom={["w-[100%]", "w-[50px] h-[50px] flex-shrink-0"]}
         handleCreateSpace={handleCreateSpace}
         handleGoBack={handleGoBack}
       />

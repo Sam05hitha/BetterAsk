@@ -12,6 +12,10 @@
   position: relative;
 }
 
+.no_navbar {
+  min-height: 100vh;
+}
+
 .home_spaces {
   margin: 90px;
   flex-direction: column;

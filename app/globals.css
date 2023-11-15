@@ -19,3 +19,7 @@
 body {
   color: rgb(var(--foreground-rgb));
 }
+
+.full-height {
+  min-height: 100vh;
+}
