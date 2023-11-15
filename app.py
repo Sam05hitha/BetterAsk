@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, HTTPException, File
+from fastapi import FastAPI, UploadFile, HTTPException, File, Depends
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
@@ -8,11 +8,39 @@ from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-import components.authenticate as authenticate
 from typing import List  # Import List
+import io
+import os
+import psycopg2
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 
-OPENAI_API_KEY = "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"
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the OpenAI API key from the environment variables
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# PostgreSQL connection settings
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Create a connection to the PostgreSQL database
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+# Create a cursor object to interact with the database
+cursor = conn.cursor()
+
+# FastAPI application
 app = FastAPI()
+
+# Enable CORS (Cross-Origin Resource Sharing)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (change this in production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 class ChatSession:
     def __init__(self):
@@ -23,11 +51,30 @@ class ChatSession:
 # Replace with a suitable data structure (like a dict) for multiple sessions
 global_chat_session = ChatSession()
 
-def get_pdf_text(pdf_file: UploadFile):
+async def get_conversation(query):
+    if global_chat_session.conversation is None:
+        raise HTTPException(status_code=400, detail="No documents processed yet")
+    return global_chat_session.conversation({'question': query})
+
+def get_chat_session():
+    return ChatSession()
+
+# Dependency to get the database cursor
+async def get_db_cursor():
+    db = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cursor = db.cursor()
+    try:
+        yield cursor
+    finally:
+        cursor.close()
+        db.close()
+
+def get_pdf_text(pdf_files: UploadFile):
     # Code to read text from PDF
     text = ""
-    for pdf in pdf_file:
-        pdf_reader = PdfReader(pdf)
+    for pdf_file in pdf_files:
+        pdf_bytes = io.BytesIO(pdf_file.file.read())
+        pdf_reader = PdfReader(pdf_bytes)
         for page in pdf_reader.pages:
             text += page.extract_text()
 
@@ -61,21 +108,70 @@ def get_conversation_chain(vectorstore):
         memory=memory
     )
 
+    print(conversation_chain)
+
     return conversation_chain
 
+@app.get("/get-conversation-history/{conversation_id}")
+async def get_conversation_history(conversation_id: int, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+    # Retrieve the conversation history from the database
+    
+    select_query = "SELECT user_query, assistant_response FROM conversation_history WHERE id = %s;"
+    cursor.execute(select_query, (conversation_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append({"role": "user", "content": row[0]})
+        conversation_chain.append({"role": "assistant", "content": row[1]})
+
+    return {"conversation_chain": conversation_chain}
+
 @app.post("/chat/{query}")
-async def chat(query: str):
-    if global_chat_session.conversation is None:
-        raise HTTPException(status_code=400, detail="No documents processed yet")
-    response = global_chat_session.conversation({'question': query})
-    global_chat_session.chat_history.append({"role": "user", "content": query})
-    global_chat_session.chat_history.append({"role": "assistant", "content": response["answer"]})
-    return {"answer": response["answer"]}
+async def chat(query: str, conversation_id: int = None, chat_session: ChatSession = Depends(get_chat_session)):
+    if conversation_id is None:
+        # If conversation_id is not provided, generate a new one
+        insert_query = "INSERT INTO conversation_history (user_query, assistant_response) VALUES (%s, %s) RETURNING id;"
+        cursor.execute(insert_query, (query, ""))
+        conversation_id = cursor.fetchone()[0]
+        conn.commit()
+
+    # Retrieve the conversation history from the database
+    select_query = "SELECT user_query, assistant_response FROM conversation_history WHERE id = %s;"
+    cursor.execute(select_query, (conversation_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append({"role": "user", "content": row[0]})
+        conversation_chain.append({"role": "assistant", "content": row[1]})
+
+    # Call the get_conversation method of the chat session
+    response = await get_conversation(query)
+
+    # Insert the new response into the database
+    update_query = "UPDATE conversation_history SET assistant_response = %s WHERE id = %s;"
+    cursor.execute(update_query, (response["answer"], conversation_id))
+    conn.commit()
+
+    return {"answer": response["answer"], "conversation_id": conversation_id}
 
 @app.post("/process-documents")
 async def process_documents(pdf_files: List[UploadFile] = File(...)):
+
+    # Code to process the documents
     raw_text = get_pdf_text(pdf_files)
     text_chunks = get_text_chunks(raw_text)
     vectorstore = get_vectorstore(text_chunks)
+
+    # Set the global_chat_session.conversation after processing documents
     global_chat_session.conversation = get_conversation_chain(vectorstore)
+
     return {"message": "Documents processed. Start asking questions using /chat/<query>"}
+
+if __name__ == "__main__":
+    import uvicorn
+    # Run the FastAPI application using Uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
