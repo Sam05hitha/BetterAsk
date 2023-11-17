@@ -3,10 +3,30 @@
   width: 20%;
   height: calc(100vh - 140px);
   max-height: calc(100vh - 140px);
+  position: relative;
   border-radius: 10px;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 30px;
+  transition: opacity 0.3 ease-out;
+
+  & * :not(.collapse_sidebar) {
+    opacity: 1;
+  }
+}
+
+.collapse_sidebar {
+  position: absolute;
+  top: 50%;
+  // transform: translateY(-50%);
+  right: -20px;
+  border-radius: 10px;
+  width: 8px;
+  height: 30px;
+  background-color: #c5d2ffeb;
+
+  &:hover {
+    animation: breadDrop 0.3s ease-in-out;
+    z-index: 100;
+    display: block;
+  }
 }
 
 .no_navbar {
@@ -14,7 +34,35 @@
   max-height: calc(100vh - 60px);
 }
 
+.collapsed_sidebar {
+  width: 0;
+  padding: 0;
+
+  & * :not(.collapse_sidebar) {
+    opacity: 0;
+    display: none;
+  }
+}
+
 .chatAction_recent {
   margin-top: 20px;
   margin-bottom: 10px;
+}
+
+@keyframes breadDrop {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.5);
+  }
+  40% {
+    transform: scale(0.7);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

@@ -15,7 +15,7 @@ export default function Tooltip({ text, show }: ITooltip) {
         show ? style.tooltip_visible : ""
       }`}
     >
-      <div className="relative">
+      <div className="relative z-50">
         <div className={` bg-text ${style.tooltip_floating}`}>{text}</div>
       </div>
     </div>
