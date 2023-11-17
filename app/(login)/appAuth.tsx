@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { memo, useReducer } from "react";
 import isEmail from "validator/lib/isEmail";
 import style from "./login.module.scss";
 import { usePathname } from "next/navigation";
@@ -54,7 +54,9 @@ const reducer = (state: TLogin, action: TLoginAction) => {
 };
 
 export default function appAuth(WrappedComponent: any) {
-  return (props: any) => {
+  const MemoComponent = memo(WrappedComponent);
+
+  const AuthWrapper = (props: any) => {
     const path = usePathname();
     const [inputs, dispatch] = useReducer(reducer, initialState);
 
@@ -77,7 +79,7 @@ export default function appAuth(WrappedComponent: any) {
         <h1 className="text-3xl font-extrabold">
           {path === "/login" ? "Sign in" : "Sign Up"}
         </h1>
-        <WrappedComponent
+        <MemoComponent
           {...props}
           inputs={inputs}
           handleInputChange={handleInputChange}
@@ -86,4 +88,8 @@ export default function appAuth(WrappedComponent: any) {
       </main>
     );
   };
+
+  AuthWrapper.displayName = "AuthWrapper";
+
+  return AuthWrapper;
 }

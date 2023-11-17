@@ -5,6 +5,8 @@ import style from "./actionButton.module.scss";
 import { Button } from "@/app/_components";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import KeyboardReturnRoundedIcon from "@mui/icons-material/KeyboardReturnRounded";
+import Tooltip from "../Tooltip/Tooltip";
+import useTooltip from "@/app/_hooks/useTooltip";
 
 type TActionButtons = {
   spaces?: undefined | true;
@@ -19,6 +21,8 @@ export default function ActionButtons({
   handleCreateSpace,
   handleGoBack,
 }: TActionButtons) {
+  const [showBackTooltip, onShow, onHide] = useTooltip();
+
   return (
     <div className={style.chatAction_top_buttons}>
       {spaces && (
@@ -36,13 +40,16 @@ export default function ActionButtons({
         </Button>
       )}
       <Button
+        onHover={onShow}
+        onHoverOut={onHide}
         onClick={handleGoBack}
-        custom={`${custom && custom[1]} bg-white font-geo`}
+        custom={`${custom && custom[1]} relative bg-white font-geo`}
         variant="outlined"
         size="bwide"
         color="white"
       >
         <KeyboardReturnRoundedIcon />
+        <Tooltip show={showBackTooltip} text="go back" />
       </Button>
     </div>
   );

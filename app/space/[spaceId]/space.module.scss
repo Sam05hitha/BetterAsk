@@ -40,10 +40,10 @@
   width: 100%;
   @extend %height;
   margin-left: 40px;
-  position: sticky;
-  border-radius: 10px;
-  position: -webkit-sticky;
-  top: 30px;
+  // position: sticky;
+  // border-radius: 10px;
+  // position: -webkit-sticky;
+  // top: 30px;
 }
 
 .space_page_container {
