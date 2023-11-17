@@ -18,8 +18,8 @@ export default function CreateSpaceFooter() {
       <div className={`text-text-100 ${style.create_space_note}`}>
         <InfoOutlinedIcon />
         <p>
-          In order to create a space, it's mandatory to specify a unique space
-          name and upload the necessary documents.
+          In order to create a space, it&rsquo;s mandatory to specify a unique
+          space name and upload the necessary documents.
         </p>
       </div>
 

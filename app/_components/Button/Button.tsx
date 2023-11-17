@@ -9,7 +9,10 @@ type TButton = {
   children: any;
   onClick?: any;
   custom?: string;
+  onHover?: any;
+  onHoverOut?: any;
 };
+
 export default function Button({
   variant,
   size,
@@ -18,12 +21,16 @@ export default function Button({
   children,
   onClick,
   custom,
+  onHoverOut,
+  onHover,
 }: TButton) {
   const bgColor = `bg-${color}`;
   const bSize = `${style[size]}`;
 
   return (
     <button
+      onMouseOver={onHover}
+      onMouseOut={onHoverOut}
       onClick={onClick}
       className={`${
         variant == "filled"
