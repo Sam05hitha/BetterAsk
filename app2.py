@@ -76,14 +76,14 @@ async def get_user_conversation_history(session_id: str, db: psycopg2.extensions
     user_id = get_or_create_user_id(session_id)
 
     # Retrieve the conversation history for a specific user from the database
-    select_query = "SELECT user_query, assistant_response, id, timestamp FROM user_conversation_history WHERE user_id = %s;"
+    select_query = "SELECT user_query, assistant_response, user_id, timestamp, id FROM user_conversation_history WHERE user_id = %s;"
     cursor.execute(select_query, (user_id,))
     history = cursor.fetchall()
 
     # Reconstruct the conversation chain
     conversation_chain = []
     for row in history:
-        conversation_chain.append({"converstaion_id": row ,"query": row[0], "answer": row[1], "user_id": row[2],  "timestamp": row[3]})
+        conversation_chain.append({"query": row[0], "answer": row[1], "user_id": row[2],  "timestamp": row[3], "converstaion_id": row[4]})
 
     return {"conversation_chain": conversation_chain}
 
