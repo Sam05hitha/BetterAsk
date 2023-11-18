@@ -70,32 +70,34 @@ async def get_db_cursor():
         cursor.close()
         db.close()
 
-@app.get("/get-conversation-history/{user_id}")
-async def get_user_conversation_history(user_id: int, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+@app.get("/get-conversation-history/{session_id}")
+async def get_user_conversation_history(session_id: str, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+
+    user_id = get_or_create_user_id(session_id)
+
     # Retrieve the conversation history for a specific user from the database
-    select_query = "SELECT user_query, assistant_response FROM user_conversation_history WHERE user_id = %s;"
+    select_query = "SELECT user_query, assistant_response, id, timestamp FROM user_conversation_history WHERE user_id = %s;"
     cursor.execute(select_query, (user_id,))
     history = cursor.fetchall()
 
     # Reconstruct the conversation chain
     conversation_chain = []
     for row in history:
-        conversation_chain.append({"role": "user", "content": row[0]})
-        conversation_chain.append({"role": "assistant", "content": row[1]})
+        conversation_chain.append({"converstaion_id": row ,"query": row[0], "answer": row[1], "user_id": row[2],  "timestamp": row[3]})
 
     return {"conversation_chain": conversation_chain}
 
-def get_or_create_user_id(user_email):
+def get_or_create_user_id(session_id):
 
     # Check if the user exists in the 'users' table
     check_user_query = "SELECT id FROM users WHERE email = %s;"
-    cursor.execute(check_user_query, (user_email,))
+    cursor.execute(check_user_query, (session_id,))
     user_result = cursor.fetchone()
 
     # If the user doesn't exist, create a new user
     if user_result is None:
         create_user_query = "INSERT INTO users (email) VALUES (%s) RETURNING id;"
-        cursor.execute(create_user_query, (user_email,))
+        cursor.execute(create_user_query, (session_id,))
         user_id = cursor.fetchone()[0]
         conn.commit()
     else:
@@ -105,17 +107,18 @@ def get_or_create_user_id(user_email):
 
 class ChatRequest(BaseModel):
     query: str
-    user_email: str
+    session_id: str
 
 @app.post("/chat/{query}")
 async def chat(request: ChatRequest, conversation_id: int = None, chat_session: ChatSession = Depends(get_chat_session)):
-    user_email = request.user_email
+
+    session_id = request.session_id
     query = request.query
 
-    if user_email is None:
-        raise HTTPException(status_code=400, detail="user_email is required")
+    if session_id is None:
+        raise HTTPException(status_code=400, detail="session_id is required")
 
-    user_id = get_or_create_user_id(user_email)
+    user_id = get_or_create_user_id(session_id)
 
     if conversation_id is None:
         # If conversation_id is not provided, generate a new one
@@ -132,8 +135,7 @@ async def chat(request: ChatRequest, conversation_id: int = None, chat_session: 
     # Reconstruct the conversation chain
     conversation_chain = []
     for row in history:
-        conversation_chain.append({"role": "user", "content": row[0]})
-        conversation_chain.append({"role": "assistant", "content": row[1]})
+        conversation_chain.append({"user_id": user_id, "converstaion_id": conversation_id,"query": row[0], "answer": row[1]})
 
     # Call the `get_conversation` method of the chat session
     response = await get_conversation(query, user_id)
@@ -143,16 +145,19 @@ async def chat(request: ChatRequest, conversation_id: int = None, chat_session: 
     cursor.execute(update_query, (response["answer"], conversation_id))
     conn.commit()
 
-    return {"answer": response["answer"], "conversation_id": conversation_id}
+    return {"answer": response["answer"], "conversation_id": conversation_id, "user_id": user_id}
 
-def get_pdf_text(pdf_files: UploadFile):
+def get_pdf_text(pdf_files):
     # Code to read text from PDF
     text = ""
     for pdf_file in pdf_files:
-        pdf_bytes = io.BytesIO(pdf_file.file.read())
-        pdf_reader = PdfReader(pdf_bytes)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+
+        print("Reading file: ", pdf_file)
+
+        with open(os.path.join("posh-docs", pdf_file), "rb") as file:
+            pdf_reader = PdfReader(file)
+            for page in pdf_reader.pages:
+                text += page.extract_text()
 
     return text
 
@@ -190,11 +195,14 @@ def get_conversation_chain(vectorstore):
 
 
 @app.post("/process-documents")
-async def process_documents(pdf_files: List[UploadFile] = File(...)):
+async def process_documents():
+    
+    # chat_session = session_storage.get(session_id)
 
-
+    # print(chat_session)
+    
     # Code to process the documents
-    raw_text = get_pdf_text(pdf_files)
+    raw_text = get_pdf_text(os.listdir('posh-docs'))
     text_chunks = get_text_chunks(raw_text)
     vectorstore = get_vectorstore(text_chunks)
 
