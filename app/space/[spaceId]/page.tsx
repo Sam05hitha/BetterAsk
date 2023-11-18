@@ -23,7 +23,7 @@ const data = [
   },
 ];
 
-export default function page({ params }: { params: { spaceId: string } }) {
+export default function SpaceWithID({ params }: { params: { spaceId: string } }) {
   const [currentMessage, setCurrentMassage] = useState<string>("");
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
