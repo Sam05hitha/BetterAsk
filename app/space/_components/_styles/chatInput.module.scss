@@ -1,5 +1,5 @@
 .space_page_chat_input {
-  width: calc(100% - 10px);
+  width: calc(100%);
   position: sticky;
   position: -webkit-sticky;
   top: 0;
@@ -37,7 +37,7 @@
       height: 30px;
     }
 
-    &:active {
+    &:not(:disabled):active {
       filter: opacity(0.3);
     }
   }

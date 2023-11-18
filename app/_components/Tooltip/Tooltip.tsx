@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import style from "./tooltip.module.scss";
 
 interface ITooltip {
