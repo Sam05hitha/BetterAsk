@@ -11,13 +11,13 @@ export default function page({ params }: { params: { spaceId: string } }) {
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
     //TODO : set change state
+    const value = event.currentTarget.value;
+    setCurrentMassage(value ? value : "");
   }
 
   function handleOnSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const value = event.currentTarget.value?.trim();
     //TODO: submit message
-    setCurrentMassage(value ? value : "");
   }
 
   return (
