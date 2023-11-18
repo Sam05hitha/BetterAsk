@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ActionButtons } from "@/app/_components";
 import Tooltip from "@/app/_components/Tooltip/Tooltip";
 import useTooltip from "@/app/_hooks/useTooltip";
+import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
 
 export default function ChatAction() {
   const router = useRouter();
@@ -31,7 +32,9 @@ export default function ChatAction() {
       <div
         className={`${style.chatAction_container} ${
           style.no_navbar
-        } bg-secondary-100 ${collapse ? style.collapsed_sidebar : ""}`}
+        } bg-secondary-100 ${collapse ? style.collapsed_sidebar : ""} ${
+          showCollapseButton ? style.chatAction_container_hide_hovered : ""
+        }`}
       >
         <ActionButtons
           spaces
@@ -45,9 +48,22 @@ export default function ChatAction() {
           onClick={onCollapseClick}
           onMouseOver={onshow}
           onMouseOut={onHide}
-          className={style.collapse_sidebar}
+          className={style.collapse_sidebar_button}
         >
-          <Tooltip show={showCollapseButton} text="hide sidebar" />
+          <svg
+            className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+            focusable="false"
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            data-testid="SignalCellularAlt1BarRoundedIcon"
+          >
+            <path d="M6.5 20c-.83 0-1.5-.67-1.5-1.5v-17c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v17c0 .83-.67 1.5-1.5 1.5z"></path>
+          </svg>
+
+          <Tooltip
+            show={showCollapseButton}
+            text={collapse ? "show sidebar" : "hide sidebar"}
+          />
         </button>
       </div>
     </>

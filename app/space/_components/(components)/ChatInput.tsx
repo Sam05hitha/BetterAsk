@@ -7,11 +7,13 @@ import SendIcon from "../../../../public/send.svg";
 interface TChatInput {
   handleOnSubmit: TOnSubmit;
   handleOnChange: TOnChange;
+  value: string;
 }
 
 export default function ChatInput({
   handleOnSubmit,
   handleOnChange,
+  value,
 }: TChatInput) {
   return (
     <form
@@ -20,11 +22,18 @@ export default function ChatInput({
     >
       <div>
         <input
+          value={value}
           placeholder="Enter your message here"
           type="text"
           onChange={handleOnChange}
         />
-        <button type="submit" className={style.space_send_button}>
+        <button
+          disabled={!value ? true : false}
+          type="submit"
+          className={
+            value ? style.space_send_button : style.space_send_button_disabled
+          }
+        >
           <div>
             <Image objectFit="cover" src={SendIcon} alt="send message" />
           </div>

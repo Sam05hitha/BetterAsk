@@ -23,3 +23,12 @@ body {
 .full-height {
   min-height: 100vh;
 }
+
+button:disabled {
+  user-select: none;
+  filter: opacity(0.5);
+  color: #6c7181c2;
+  & * {
+    color: #6c7181c2;
+  }
+}
