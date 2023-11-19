@@ -1,0 +1,78 @@
+.start_space_container_main {
+  width: 750px;
+  height: 400px;
+  border-radius: 10px;
+  background-color: white;
+  overflow: hidden;
+}
+
+.start_space_card_items_container {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  display: flex;
+  height: 100%;
+  width: max-content;
+  transform: translateX(0);
+  transition: all 0.3s ease-in;
+}
+
+@for $i from 0 through 2 {
+  .start_space_card_items_container {
+    &.slide_#{$i} {
+      transform: translateX(-#{$i * 750}px);
+    }
+  }
+}
+
+.start_space_card_item {
+  border-radius: 10px;
+  background: url("../../../public/slide-bg.svg") repeat;
+  background-size: 130%;
+  flex-shrink: 0;
+  width: 750px;
+  height: 100%;
+  padding: 50px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  h2 {
+    font-size: 24px;
+  }
+
+  form {
+    padding: 0;
+    margin-left: 30px;
+  }
+}
+
+@mixin slide_button($L, $LOffset, $R, $ROffset) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & span {
+    transition: 0.5s ease;
+    margin-right: $R;
+    margin-left: $L;
+  }
+
+  &:hover {
+    & span {
+      margin-left: $LOffset;
+      margin-right: $ROffset;
+    }
+  }
+}
+
+.start_space_card_footer {
+  display: flex;
+  margin-top: 30px;
+
+  .start_slide_button {
+    margin-left: auto;
+    @include slide_button(auto, auto, 10px, 13px);
+  }
+  .back_slide_button {
+    @include slide_button(10px, 13px, auto, auto);
+  }
+}

@@ -6,7 +6,11 @@ import { ChatContainer, ChatInput, SpaceHeading } from "../_components";
 
 const data: any = [];
 
-export default function page({ params }: { params: { spaceId: string } }) {
+export default function NewChatModel({
+  params,
+}: {
+  params: { spaceId: string };
+}) {
   const [currentMessage, setCurrentMassage] = useState<string>("");
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {

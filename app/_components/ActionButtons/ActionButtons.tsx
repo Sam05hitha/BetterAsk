@@ -2,10 +2,9 @@
 
 import React from "react";
 import style from "./actionButton.module.scss";
-import { Button } from "@/app/_components";
+import { Button, ToolTip } from "@/app/_components";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import KeyboardReturnRoundedIcon from "@mui/icons-material/KeyboardReturnRounded";
-import Tooltip from "../Tooltip/Tooltip";
 import useTooltip from "@/app/_hooks/useTooltip";
 
 type TActionButtons = {
@@ -49,7 +48,7 @@ export default function ActionButtons({
         color="white"
       >
         <KeyboardReturnRoundedIcon />
-        <Tooltip show={showBackTooltip} text="go back" />
+        <ToolTip show={showBackTooltip} text="go back" />
       </Button>
     </div>
   );

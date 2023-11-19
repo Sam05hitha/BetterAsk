@@ -8,12 +8,14 @@ interface TChatInput {
   handleOnSubmit: TOnSubmit;
   handleOnChange: TOnChange;
   value: string;
+  placeHolder?: string;
 }
 
 export default function ChatInput({
   handleOnSubmit,
   handleOnChange,
   value,
+  placeHolder,
 }: TChatInput) {
   return (
     <form
@@ -23,7 +25,7 @@ export default function ChatInput({
       <div>
         <input
           value={value}
-          placeholder="Enter your message here"
+          placeholder={placeHolder || "Enter your message here"}
           type="text"
           onChange={handleOnChange}
         />

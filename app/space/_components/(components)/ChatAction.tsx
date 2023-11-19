@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import style from "../_styles/chatAction.module.scss";
 import { Recent, TopSpaces } from "..";
 import { useRouter } from "next/navigation";
-import { ActionButtons } from "@/app/_components";
-import Tooltip from "@/app/_components/Tooltip/Tooltip";
+import { ActionButtons, ToolTip } from "@/app/_components";
 import useTooltip from "@/app/_hooks/useTooltip";
 import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
 
@@ -60,7 +59,7 @@ export default function ChatAction() {
             <path d="M6.5 20c-.83 0-1.5-.67-1.5-1.5v-17c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v17c0 .83-.67 1.5-1.5 1.5z"></path>
           </svg>
 
-          <Tooltip
+          <ToolTip
             show={showCollapseButton}
             text={collapse ? "show sidebar" : "hide sidebar"}
           />
