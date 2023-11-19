@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: my_fastapi_app
+    container_name: betterask-api
     environment:
       DATABASE_URL: postgresql://betterask:betterask@host.docker.internal:2762/BetterAsk
     ports:
