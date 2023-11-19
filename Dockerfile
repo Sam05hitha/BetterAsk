@@ -11,6 +11,7 @@ RUN pip install -r req.txt
 # Bundle app source
 COPY . /app
 
+EXPOSE 8000
+
 CMD [ "python", "app.py" ]
 
-EXPOSE 8000
