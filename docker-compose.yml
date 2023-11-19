@@ -5,9 +5,9 @@ services:
     image: postgres:latest
     container_name: postgres-betterask
     environment:
-      POSTGRES_USER: betterask
-      POSTGRES_PASSWORD: betterask
-      POSTGRES_DB: BetterAsk
+      POSTGRES_USER: ${POSTGRES_USER:-betterask}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-betterask}
+      POSTGRES_DB: ${POSTGRES_DB:-BetterAsk}
     volumes:
       - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
     container_name: betterask-api
     environment:
-      DATABASE_URL: postgresql://betterask:betterask@host.docker.internal:2762/BetterAsk
+      DATABASE_URL: postgresql://${POSTGRES_USER:-betterask}:${POSTGRES_PASSWORD:-betterask}@host.docker.internal:2762/${POSTGRES_DB:-BetterAsk}
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
     extra_hosts:
