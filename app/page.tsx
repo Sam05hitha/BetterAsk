@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import style from "./main.module.scss";
-import { Button } from "./_components";
+import { Button, StartSpaceCard } from "./_components";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Hbg from "../public/home-bg.svg";
@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <main className={`${style.home_container} ${style.no_navbar} bg-primary`}>
-      <h1 className="font-inria text-5xl ">BetterAsk</h1>
+      {/* <h1 className="font-inria text-5xl ">BetterAsk</h1>
 
       <div className={style.home_spaces}>
         <div>
@@ -45,7 +45,8 @@ export default function Home() {
         <Link className="text-white text-lg  underline font-geo" href={""}>
           view more
         </Link>
-      </div>
+      </div> */}
+      <StartSpaceCard />
       <div className={style.home_bgImage}>
         <Image src={Hbg} priority alt="" />
       </div>
