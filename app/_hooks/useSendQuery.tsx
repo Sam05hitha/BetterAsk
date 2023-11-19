@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getQuery } from "../services/getUsers";
+import { getQuery } from "../_services/getUsers";
 import { getCookie } from "../_utils/methods";
 
 export default function useSendQuery() {

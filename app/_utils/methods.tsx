@@ -3,15 +3,24 @@ import cookie from "cookie";
 export function setCookie() {
   const options = { maxAge: 60 * 60 * 24 * 365 };
   const userIds = generateRandomId(10);
-  if (!document.cookie) {
-    document.cookie = cookie.serialize("better_ask_user_id", userIds, options);
+  if (typeof document !== "undefined") {
+    if (!document.cookie) {
+      document.cookie = cookie.serialize(
+        "better_ask_user_id",
+        userIds,
+        options
+      );
+    }
   }
 }
 
 export function getCookie() {
-  const cookies = cookie.parse(document.cookie);
-  const storedUserId = cookies.better_ask_user_id || "";
-  return storedUserId;
+  if (typeof document !== "undefined") {
+    const cookies = cookie.parse(document.cookie);
+    const storedUserId = cookies.better_ask_user_id || "";
+    return storedUserId;
+  }
+  return "";
 }
 
 export function generateRandomId(length: number) {
