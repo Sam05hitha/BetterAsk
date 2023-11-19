@@ -48,7 +48,7 @@ export default function Home() {
       </div> */}
       <StartSpaceCard />
       <div className={style.home_bgImage}>
-        <Image src={Hbg} priority alt="" />
+        <Image src={Hbg} priority alt="icon" />
       </div>
     </main>
   );

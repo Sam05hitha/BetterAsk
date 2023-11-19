@@ -6,6 +6,7 @@ import KeyboardBackspaceRoundedIcon from "@mui/icons-material/KeyboardBackspaceR
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import { ChatInput } from "@/app/space/_components";
 import { useRouter } from "next/navigation";
+import { setCookie } from "@/app/_utils/methods";
 
 const slides = [
   {
@@ -52,11 +53,16 @@ export default function StartSpaceCard() {
   function handleStartChatInput(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     setStartChatInputValue(value);
+    setCookie();
   }
+
   function handleStartChatSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    
-    router.push("/space/new_chat_model");
+    const newPath = `/space/new_chat_model?chatStartInput=${encodeURIComponent(
+      startChatInputValue
+    )}`;
+    router.push(newPath);
+    setStartChatInputValue("");
   }
 
   return (
