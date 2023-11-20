@@ -7,6 +7,7 @@ import useConversation from "@/app/_hooks/useConversation";
 import useSendQuery from "@/app/_hooks/useSendQuery";
 import { CONVERSATIONS } from "@/app/_utils/constants";
 import { TConversation } from "@/app/_utils/types";
+import { processDocuments } from "@/app/_services/getUsers";
 
 interface INewChatModel {
   searchParams?: { chatStartInput: string | undefined | null };
@@ -34,6 +35,13 @@ export default function SpaceWithID({ params }: INewChatModel) {
   useEffect(() => {
     if (response) refresh();
   }, [response]);
+
+  useEffect(() => {
+    async function process() {
+      await processDocuments();
+    }
+    process();
+  }, []);
 
   return (
     <div
