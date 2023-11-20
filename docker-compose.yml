@@ -11,7 +11,7 @@ services:
     volumes:
       - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "2762:5432"  # Map container port 5432 to host port 1234
+      - "${POSTGRES_PORT:-2762}:5432"  # Map container port 5432 to host port 1234
 
   fastapi-app:
     build:
@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
     container_name: betterask-api
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-betterask}:${POSTGRES_PASSWORD:-betterask}@host.docker.internal:2762/${POSTGRES_DB:-BetterAsk}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-betterask}:${POSTGRES_PASSWORD:-betterask}@${POSTGRES_HOST:-host.docker.internal}:${POSTGRES_PORT:-2762}/${POSTGRES_DB:-BetterAsk}
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
     extra_hosts:

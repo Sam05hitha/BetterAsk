@@ -18,10 +18,18 @@ load_dotenv()
 # Retrieve the OpenAI API key from the environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# PostgreSQL connection settings
-DATABASE_URL = os.getenv("DATABASE_URL")
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("POSTGRES_HOST")
+DB_PORT = os.getenv("POSTGRES_PORT")
+DB_DB = os.getenv("POSTGRES_DB")
 
-# Create a connection to the PostgreSQL database
+# PostgreSQL connection settings
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DB}"
+
+print(DATABASE_URL)
+
+# Create a connection to the DBQL database
 conn = psycopg2.connect(DATABASE_URL, sslmode='prefer')
 
 # Create a cursor object to interact with the database
@@ -66,23 +74,6 @@ async def get_db_cursor():
         cursor.close()
         db.close()
 
-@app.get("/get-conversation-history/{session_id}")
-async def get_user_conversation_history(session_id: str, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
-
-    user_id = get_or_create_user_id(session_id)
-
-    # Retrieve the conversation history for a specific user from the database
-    select_query = "SELECT user_query, assistant_response, user_id, timestamp, id FROM user_conversation_history WHERE user_id = %s;"
-    cursor.execute(select_query, (user_id,))
-    history = cursor.fetchall()
-
-    # Reconstruct the conversation chain
-    conversation_chain = []
-    for row in history:
-        conversation_chain.append({"query": row[0], "answer": row[1], "user_id": row[2],  "timestamp": row[3], "converstaion_id": row[4]})
-
-    return {"conversation_chain": conversation_chain}
-
 def get_or_create_user_id(session_id):
 
     # Check if the user exists in the 'users' table
@@ -100,48 +91,6 @@ def get_or_create_user_id(session_id):
         user_id = user_result[0]
 
     return user_id
-
-class ChatRequest(BaseModel):
-    query: str
-    session_id: str
-
-@app.post("/chat/{query}")
-async def chat(request: ChatRequest, conversation_id: int = None, chat_session: ChatSession = Depends(get_chat_session)):
-
-    session_id = request.session_id
-    query = request.query
-
-    if session_id is None:
-        raise HTTPException(status_code=400, detail="session_id is required")
-
-    user_id = get_or_create_user_id(session_id)
-
-    if conversation_id is None:
-        # If conversation_id is not provided, generate a new one
-        insert_query = "INSERT INTO user_conversation_history (user_id, user_query, assistant_response) VALUES (%s, %s, %s) RETURNING id;"
-        cursor.execute(insert_query, (user_id, query, ""))
-        conversation_id = cursor.fetchone()[0]
-        conn.commit()
-
-    # Retrieve the conversation history from the database
-    select_query = "SELECT user_query, assistant_response FROM user_conversation_history WHERE id = %s;"
-    cursor.execute(select_query, (conversation_id,))
-    history = cursor.fetchall()
-
-    # Reconstruct the conversation chain
-    conversation_chain = []
-    for row in history:
-        conversation_chain.append({"user_id": user_id, "converstaion_id": conversation_id,"query": row[0], "answer": row[1]})
-
-    # Call the `get_conversation` method of the chat session
-    response = await get_conversation(query)
-
-    # Insert the new response into the database
-    update_query = "UPDATE user_conversation_history SET assistant_response = %s WHERE id = %s;"
-    cursor.execute(update_query, (response["answer"], conversation_id))
-    conn.commit()
-
-    return {"answer": response["answer"], "conversation_id": conversation_id, "user_id": user_id}
 
 def get_pdf_text(pdf_files):
     # Code to read text from PDF
@@ -189,7 +138,6 @@ def get_conversation_chain(vectorstore):
 
     return conversation_chain
 
-
 @app.post("/process-documents")
 async def process_documents():
     
@@ -203,6 +151,118 @@ async def process_documents():
 
     return {"message": "Documents processed. Start asking questions using /chat/<query>"}
 
+class UserSession(BaseModel):
+    session_id: str
+
+@app.get("/get-conversation-history")
+async def get_user_conversation_history(session: UserSession, _ : psycopg2.extensions.cursor = Depends(get_db_cursor)):
+
+    session_id = session.session_id
+
+    user_id = get_or_create_user_id(session_id)
+
+    # Retrieve the conversation history for a specific user from the database
+    select_query = "SELECT user_query, assistant_response, user_id, timestamp, id FROM user_conversation_history WHERE user_id = %s;"
+    cursor.execute(select_query, (user_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append({"query": row[0], "answer": row[1], "user_id": row[2],  "timestamp": row[3], "converstaion_id": row[4]})
+
+    return {"conversation_chain": conversation_chain}
+
+class ChatRequest(BaseModel):
+    query: str
+    session_id: str
+
+@app.post("/chat")
+async def chat(request: ChatRequest, conversation_id: int = None, _ : ChatSession = Depends(get_chat_session)):
+
+    session_id = request.session_id
+    query = request.query
+
+    if session_id is None:
+        raise HTTPException(status_code=400, detail="session_id is required")
+
+    user_id = get_or_create_user_id(session_id)
+
+    if conversation_id is None:
+        # If conversation_id is not provided, generate a new one
+        insert_query = "INSERT INTO user_conversation_history (user_id, user_query, assistant_response) VALUES (%s, %s, %s) RETURNING id;"
+        cursor.execute(insert_query, (user_id, query, ""))
+        conversation_id = cursor.fetchone()[0]
+        conn.commit()
+
+    # Retrieve the conversation history from the database
+    select_query = "SELECT user_query, assistant_response FROM user_conversation_history WHERE id = %s;"
+    cursor.execute(select_query, (conversation_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append({"user_id": user_id, "converstaion_id": conversation_id,"query": row[0], "answer": row[1]})
+
+    # Call the `get_conversation` method of the chat session
+    response = await get_conversation(query)
+
+    # Insert the new response into the database
+    update_query = "UPDATE user_conversation_history SET assistant_response = %s WHERE id = %s;"
+    cursor.execute(update_query, (response["answer"], conversation_id))
+    conn.commit()
+
+    return {"answer": response["answer"], "conversation_id": conversation_id, "user_id": user_id}
+
+class ClearChatRequest(BaseModel):
+    session_id: str
+
+@app.post("/clear-chat")
+async def clear_chat(request: ClearChatRequest, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+    
+    user_id = get_or_create_user_id(request.session_id)
+
+    # Clear the conversation history for the specified user
+    clear_query = "DELETE FROM user_conversation_history WHERE user_id = %s;"
+    db.execute(clear_query, (user_id,))
+    conn.commit()
+
+    return {"message": "Conversation history cleared successfully."}
+
+class UserFeedback(BaseModel):
+    session_id: str
+    user_feedback: str
+
+@app.post("/feedback")
+async def submit_user_feedback(feedback: UserFeedback, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+    user_id = get_or_create_user_id(feedback.session_id)
+
+    # Insert user feedback into the database
+    insert_query = "INSERT INTO user_feedback (user_id, feedback_id, user_feedback) VALUES (%s, DEFAULT, %s) RETURNING id;"
+    db.execute(insert_query, (user_id, feedback.user_feedback))
+    feedback_id = db.fetchone()[0]
+    conn.commit()
+
+    return {"message": "User feedback submitted successfully.", "feedback_id": feedback_id}
+
+class UserResponseFeedback(BaseModel):
+    session_id: str
+    conversation_id: int
+    like_dislike: bool
+    response_feedback: str
+
+@app.post("/response-feedback")
+async def submit_user_response_feedback(response_feedback: UserResponseFeedback, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+    user_id = get_or_create_user_id(response_feedback.session_id)
+
+    # Insert user response feedback into the database
+    insert_query = "INSERT INTO user_response_feedback (user_id, conversation_id, response_feedback_id, like_dislike, response_feedback) VALUES (%s, %s, DEFAULT, %s, %s) RETURNING id;"
+    db.execute(insert_query, (user_id, response_feedback.conversation_id, response_feedback.like_dislike, response_feedback.response_feedback))
+    response_feedback_id = db.fetchone()[0]
+    conn.commit()
+
+    return {"message": "User response feedback submitted successfully.", "response_feedback_id": response_feedback_id}
 
 if __name__ == "__main__":
     import uvicorn
