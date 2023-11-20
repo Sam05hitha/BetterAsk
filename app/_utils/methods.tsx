@@ -48,3 +48,9 @@ export function extractIdFromPath(path: string) {
   const match = path.match(/[a-zA-Z0-9]+$/);
   return match ? match[0] : null;
 }
+
+export const scrollToBottom = (ref: any) => {
+  if (ref.current) {
+    ref.current.scrollTop = ref.current.scrollHeight;
+  }
+};

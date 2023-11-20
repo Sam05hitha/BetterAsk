@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import StarsOutlinedIcon from "@mui/icons-material/StarsOutlined";
 import style from "./feedback.module.scss";
 import { sendFeedback } from "@/app/_services/commonApis";
 import { getCookie } from "@/app/_utils/methods";
 import TagFacesOutlinedIcon from "@mui/icons-material/TagFacesOutlined";
+import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 
 export default function Feedback() {
   const [openFeedback, setOpenFeedback] = useState<boolean>(false);
@@ -53,7 +53,7 @@ export default function Feedback() {
     <>
       <div className={`${style.feedback_container} bg-white `}>
         <button onClick={handleOpenPopUp} className={style.feedback_button}>
-          <StarsOutlinedIcon />
+          <FeedbackOutlinedIcon />
           <span>give us Feedback!</span>
         </button>
       </div>

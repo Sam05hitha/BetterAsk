@@ -45,7 +45,7 @@ export default function SpaceWithID({ params }: INewChatModel) {
 
   return (
     <div
-      className={`${style.space_page_outer_container} ${style.no_navbar} bg-secondary-100`}
+      className={`${style.space_page_outer_container} ${style.no_navbar} bg-secondary-200`}
     >
       {/* <SpaceHeading title="Human Resources" link="/" /> */}
       <ChatContainer data={conversations} />

@@ -18,7 +18,7 @@ export default function ChatInput({
   handleOnChange,
   value,
   placeHolder,
-  loading
+  loading,
 }: TChatInput) {
   return (
     <form
@@ -32,21 +32,27 @@ export default function ChatInput({
           type="text"
           onChange={handleOnChange}
         />
-        <button
-          disabled={!value ? true : false}
-          type="submit"
-          className={
-            value ? style.space_send_button : style.space_send_button_disabled
-          }
-        >
-          <div className="flex justify-center items-center">
-            {!loading ? (
+        {!loading ? (
+          <button
+            disabled={!value ? true : false}
+            type="submit"
+            className={
+              value ? style.space_send_button : style.space_send_button_disabled
+            }
+          >
+            <div className="flex justify-center items-center">
               <Image objectFit="cover" src={SendIcon} alt="send message" />
-            ) : (
+            </div>
+          </button>
+        ) : (
+          <button
+            className={`${style.space_send_button} ${style.space_send_button_pulse}`}
+          >
+            <div className="flex justify-center items-center">
               <PendingRoundedIcon style={{ width: "30px" }} />
-            )}
-          </div>
-        </button>
+            </div>
+          </button>
+        )}
       </div>
     </form>
   );
