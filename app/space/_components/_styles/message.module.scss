@@ -34,7 +34,7 @@
   height: 50px;
   flex-shrink: 0;
   margin-right: 15px;
-  background-color: #6D8DFFC2;
+  background-color: #6d8dffc2;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,4 +51,42 @@
 .message_text {
   font-size: 15px;
   line-height: 2;
+}
+
+.message_footer {
+  padding: 5px 10px;
+  button {
+    color: rgba(108, 113, 129, 1);
+    transition: color 0.3s;
+
+    svg {
+      transform: scale(0.8);
+    }
+
+    &:hover {
+      color: black;
+    }
+    &:active {
+      & svg {
+        animation: thumbsUpAnimation 0.5s ease-in-out;
+        transform-origin: left bottom;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
+}
+
+@keyframes thumbsUpAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }

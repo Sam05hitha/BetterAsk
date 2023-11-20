@@ -44,6 +44,7 @@
   // border-radius: 10px;
   // position: -webkit-sticky;
   // top: 30px;
+  border-radius: 10px;
 }
 
 .space_page_container {
@@ -53,8 +54,8 @@
   padding: 10px 45px 40px;
   @extend %height;
   @extend %overflow;
-  background: url("../../../public/slide-bg.svg") repeat;
-  background-size: cover;
+  background: url("../../../public/chat-bg.svg") repeat;
+  background-size: 130%;
 }
 
 .no_navbar {
