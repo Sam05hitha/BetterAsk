@@ -5,7 +5,9 @@ import style from "../_styles/chatActionTabs.module.scss";
 import Link from "next/link";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import { usePathname } from "next/navigation";
-import { extractIdFromPath } from "@/app/_utils/methods";
+import { extractIdFromPath, getCookie } from "@/app/_utils/methods";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { clearChat } from "@/app/_services/commonApis";
 
 interface ChatHeaderTypes {
   title: string;
@@ -15,9 +17,10 @@ interface ChatHeaderTypes {
 interface RecentItemsType {
   href: string;
   title: string;
+  clearChat: () => void;
 }
 
-export function ChatTabItem({ href, title }: RecentItemsType) {
+export function ChatTabItem({ clearChat, href, title }: RecentItemsType) {
   const pathname = usePathname();
 
   const isActivePath = extractIdFromPath(pathname) === extractIdFromPath(href);
@@ -30,6 +33,11 @@ export function ChatTabItem({ href, title }: RecentItemsType) {
     >
       <ChatBubbleOutlineOutlinedIcon className={style.chatTabItem_item_icon} />
       <span>{title}</span>
+      <button onClick={clearChat} className={style.chatTabItem_item_clear}>
+        <DeleteOutlineOutlinedIcon
+          className={style.chatTabItem_item_clear_icon}
+        />
+      </button>
     </Link>
   );
 }

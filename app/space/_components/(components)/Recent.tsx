@@ -7,9 +7,10 @@ import { getCookie } from "@/app/_utils/methods";
 
 interface IRecent {
   conversations: any;
+  clearChat: () => void;
 }
 
-export default function Recent({ conversations }: IRecent) {
+export default function Recent({ clearChat, conversations }: IRecent) {
   const session_id = getCookie();
   const conversation_title = conversations?.length
     ? conversations[0]?.query
@@ -20,6 +21,7 @@ export default function Recent({ conversations }: IRecent) {
       <ChatActionTabs title="Recent">
         {conversation_title ? (
           <ChatTabItem
+            clearChat={clearChat}
             href={`/space/${session_id}`}
             title={conversation_title}
           />

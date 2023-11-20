@@ -9,11 +9,12 @@ import useTooltip from "@/app/_hooks/useTooltip";
 import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
 import useConversation from "@/app/_hooks/useConversation";
 import { getCookie } from "@/app/_utils/methods";
+import { clearChat } from "@/app/_services/commonApis";
 
 export default function ChatAction() {
   const router = useRouter();
   const session_id = getCookie();
-  const { conversations, isLoading } = useConversation(session_id);
+  const { conversations, isLoading, refresh } = useConversation(session_id);
   const [showCollapseButton, onshow, onHide] = useTooltip();
   const [collapse, setCollapse] = useState<boolean>(false);
 
@@ -28,6 +29,17 @@ export default function ChatAction() {
   function handleCreateSpace() {
     // TODO create new chat channel
     router.push("/space/new_chat_model");
+  }
+
+  async function handleClearChat() {
+    const session_id = getCookie();
+    if (session_id) {
+      try {
+        await clearChat(session_id);
+      } catch (error) {
+        throw error;
+      }
+    }
   }
 
   return (
@@ -45,7 +57,7 @@ export default function ChatAction() {
           handleCreateSpace={handleCreateSpace}
           handleGoBack={handleGoBack}
         /> */}
-        <Recent conversations={conversations} />
+        <Recent clearChat={handleClearChat} conversations={conversations} />
         <TopSpaces />
         <Feedback />
         <button
