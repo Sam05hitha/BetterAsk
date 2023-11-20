@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./start_space_card.module.scss";
 import KeyboardBackspaceRoundedIcon from "@mui/icons-material/KeyboardBackspaceRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import { ChatInput } from "@/app/space/_components";
 import { useRouter } from "next/navigation";
-import { setCookie } from "@/app/_utils/methods";
+import { getCookie, setCookie } from "@/app/_utils/methods";
+import { processDocuments } from "@/app/_services/getUsers";
+import useSendQuery from "@/app/_hooks/useSendQuery";
 
 const slides = [
   {
@@ -34,9 +36,18 @@ export default function StartSpaceCard() {
     slideId: 0,
   });
   const [startChatInputValue, setStartChatInputValue] = useState<string>("");
+  const { response, error, getInputQuery, loadingQuery } = useSendQuery();
+
   const router = useRouter();
+  const currentUser = getCookie();
 
   function handleOnSlideStart() {
+    const currentUser = getCookie();
+    if (currentUser) {
+      //On start if user exists go to chat with id
+      router.push(`/space/${currentUser}`);
+      return;
+    }
     setSlide((prev) => ({
       ...prev,
       slideId: prev.slideId + 1,
@@ -53,17 +64,28 @@ export default function StartSpaceCard() {
   function handleStartChatInput(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     setStartChatInputValue(value);
-    setCookie();
   }
 
   function handleStartChatSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const newPath = `/space/new_chat_model?chatStartInput=${encodeURIComponent(
-      startChatInputValue
-    )}`;
-    router.push(newPath);
-    setStartChatInputValue("");
+    processDocuments();
+    setCookie();
+    const session_id = getCookie();
+
+    if (session_id) {
+      getInputQuery(startChatInputValue);
+      setStartChatInputValue("");
+    }
   }
+
+  useEffect(() => {
+    const session_id = getCookie();
+    if (response) {
+      if (session_id) {
+        router.push(`/space/${session_id}`);
+      }
+    }
+  }, [response]);
 
   return (
     <div className={style.start_space_container_main}>
@@ -98,6 +120,7 @@ export default function StartSpaceCard() {
                     <span className="font-medium">Back</span>
                   </button>
                   <ChatInput
+                    loading={loadingQuery}
                     placeHolder="Ask me anything about posh"
                     handleOnChange={handleStartChatInput}
                     handleOnSubmit={handleStartChatSubmit}

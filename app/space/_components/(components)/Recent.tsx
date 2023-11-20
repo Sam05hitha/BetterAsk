@@ -3,14 +3,29 @@ import style from "../_styles/chatAction.module.scss";
 
 import { ChatActionTabs } from "..";
 import { ChatTabItem } from "./ChatActionTabs";
+import { getCookie } from "@/app/_utils/methods";
 
-export default function Recent() {
+interface IRecent {
+  conversations: any;
+}
+
+export default function Recent({ conversations }: IRecent) {
+  const session_id = getCookie();
+  const conversation_title = conversations?.length
+    ? conversations[0]?.query
+    : "";
+
   return (
     <div className={style.chatAction_recent}>
       <ChatActionTabs title="Recent">
-        <ChatTabItem href="/" title="how to chat" />
-        <ChatTabItem href="/" title="how to chat" />
-        <ChatTabItem href="/" title="how to chat" />
+        {conversation_title ? (
+          <ChatTabItem
+            href={`/space/${session_id}`}
+            title={conversation_title}
+          />
+        ) : (
+          <></>
+        )}
       </ChatActionTabs>
     </div>
   );

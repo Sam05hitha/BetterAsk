@@ -1,50 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./space.module.scss";
 import { ChatContainer, ChatInput, SpaceHeading } from "../_components";
+import useConversation from "@/app/_hooks/useConversation";
+import useSendQuery from "@/app/_hooks/useSendQuery";
+import { CONVERSATIONS } from "@/app/_utils/constants";
+import { TConversation } from "@/app/_utils/types";
 
-const data = [
-  {
-    text: "What is this document about ?",
-    time: "14:21",
-  },
-  {
-    text: "Human resources (HR) departments maintain and manage a variety of documents and records related to employees, employment, and the organization. These documents serve several essential purposes, including legal compliance, employee management, and decision-making. Here are some common types of HR documents:",
-    time: "14:21",
-  },
-  {
-    text: "Human resources (HR) departments maintain and manage a variety of documents and records related to employees, employment, and the organization. These documents serve several essential purposes, including legal compliance, employee management, and decision-making. Here are some common types of HR documents:",
-    time: "14:21",
-  },
-  {
-    text: "Human resources (HR) departments maintain and manage a variety of documents and records related to employees, employment, and the organization. These documents serve several essential purposes, including legal compliance, employee management, and decision-making. Here are some common types of HR documents:",
-    time: "14:21",
-  },
-];
+interface INewChatModel {
+  searchParams?: { chatStartInput: string | undefined | null };
+  params: { spaceId: string };
+}
 
-export default function SpaceWithID({ params }: { params: { spaceId: string } }) {
+export default function SpaceWithID({ params }: INewChatModel) {
   const [currentMessage, setCurrentMassage] = useState<string>("");
+  const { conversations, isLoading, isError, refresh } = useConversation(
+    params.spaceId
+  );
+  const { response, error, getInputQuery, loadingQuery } = useSendQuery();
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
-    //TODO : set change state
     const value = event.currentTarget.value;
     setCurrentMassage(value ? value : "");
   }
 
   function handleOnSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    //TODO: submit message
+    getInputQuery(currentMessage);
+    setCurrentMassage("");
   }
+
+  useEffect(() => {
+    if (response) refresh();
+  }, [response]);
 
   return (
     <div
       className={`${style.space_page_outer_container} ${style.no_navbar} bg-secondary-100`}
     >
       {/* <SpaceHeading title="Human Resources" link="/" /> */}
-      <ChatContainer data={data} />
+      <ChatContainer data={conversations} />
       <div className="relative">
         <ChatInput
+          loading={loadingQuery}
           value={currentMessage}
           handleOnChange={handleOnChange}
           handleOnSubmit={handleOnSubmit}

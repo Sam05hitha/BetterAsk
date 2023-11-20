@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import style from "../_styles/chatActionTabs.module.scss";
 import Link from "next/link";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
+import { usePathname } from "next/navigation";
+import { extractIdFromPath } from "@/app/_utils/methods";
 
 interface ChatHeaderTypes {
   title: string;
@@ -16,9 +18,14 @@ interface RecentItemsType {
 }
 
 export function ChatTabItem({ href, title }: RecentItemsType) {
+  const pathname = usePathname();
+
+  const isActivePath = extractIdFromPath(pathname) === extractIdFromPath(href);
   return (
     <Link
-      className={`${style.chatTabItem_item} bg-secondary-200 font-geo`}
+      className={`${style.chatTabItem_item} ${
+        isActivePath ? "bg-secondary-200" : "bg-white"
+      } font-geo`}
       href={href}
     >
       <ChatBubbleOutlineOutlinedIcon className={style.chatTabItem_item_icon} />

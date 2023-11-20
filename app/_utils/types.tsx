@@ -20,3 +20,11 @@ export type TLoginAction =
 export type TOnChange = (event: ChangeEvent<HTMLInputElement>) => void;
 
 export type TOnSubmit = (event: FormEvent<HTMLFormElement>) => void;
+
+export type TConversation = {
+  query: string;
+  answer: string;
+  converstaion_id: string | number;
+  timestamp: string;
+  user_id: number;
+};
