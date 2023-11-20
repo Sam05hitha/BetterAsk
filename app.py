@@ -154,7 +154,7 @@ async def process_documents():
 class UserSession(BaseModel):
     session_id: str
 
-@app.get("/get-conversation-history")
+@app.post("/get-conversation-history")
 async def get_user_conversation_history(session: UserSession, _ : psycopg2.extensions.cursor = Depends(get_db_cursor)):
 
     session_id = session.session_id
@@ -224,7 +224,7 @@ async def clear_chat(request: ClearChatRequest, db: psycopg2.extensions.cursor =
     user_id = get_or_create_user_id(request.session_id)
 
     # Clear the conversation history for the specified user
-    clear_query = "DELETE FROM user_conversation_history WHERE user_id = %s;"
+    clear_query = "UPDATE user_conversation_history SET user_id = -1 WHERE user_id = %s;"
     db.execute(clear_query, (user_id,))
     conn.commit()
 
