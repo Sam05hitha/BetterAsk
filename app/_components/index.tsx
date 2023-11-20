@@ -9,3 +9,4 @@ export { default as Table } from "./Table/Table";
 export { default as TableButtonGroup } from "./Table/TableButtonGroup";
 export { default as StartSpaceCard } from "./StartSpaceCard/StartSpaceCard";
 export { default as ToolTip } from "./Tooltip/Tooltip";
+export { default as Feedback } from "./Feedback/Feedback";

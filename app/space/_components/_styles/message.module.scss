@@ -1,8 +1,12 @@
 .message_container {
-  font-size: 16px;
-  margin-bottom: 30px;
+  font-size: 13px;
+  margin-bottom: 10px;
   width: max-content;
   max-width: 800px;
+}
+
+.message_container_isUser {
+  align-self: flex-end;
 }
 
 .message_time {
@@ -16,7 +20,7 @@
 }
 
 .message_body {
-  padding: 16px;
+  padding: 14px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 1px 0 rgba(108, 113, 129, 0.76);
@@ -30,14 +34,21 @@
   height: 50px;
   flex-shrink: 0;
   margin-right: 15px;
-  background-color: lightgray;
+  background-color: #6D8DFFC2;
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.message_avatar_isUser {
+  background-color: lightgray;
 }
 
 .message_text {
-  font-size: 18px;
+  font-size: 15px;
+  line-height: 2;
 }

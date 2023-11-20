@@ -4,12 +4,16 @@ import React, { useState } from "react";
 import style from "../_styles/chatAction.module.scss";
 import { Recent, TopSpaces } from "..";
 import { useRouter } from "next/navigation";
-import { ActionButtons, ToolTip } from "@/app/_components";
+import { ActionButtons, Feedback, ToolTip } from "@/app/_components";
 import useTooltip from "@/app/_hooks/useTooltip";
 import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
+import useConversation from "@/app/_hooks/useConversation";
+import { getCookie } from "@/app/_utils/methods";
 
 export default function ChatAction() {
   const router = useRouter();
+  const session_id = getCookie();
+  const { conversations, isLoading } = useConversation(session_id);
   const [showCollapseButton, onshow, onHide] = useTooltip();
   const [collapse, setCollapse] = useState<boolean>(false);
 
@@ -35,14 +39,15 @@ export default function ChatAction() {
           showCollapseButton ? style.chatAction_container_hide_hovered : ""
         }`}
       >
-        <ActionButtons
+        {/* <ActionButtons
           spaces
           custom={["w-[100%]", "w-[50px] h-[50px] flex-shrink-0"]}
           handleCreateSpace={handleCreateSpace}
           handleGoBack={handleGoBack}
-        />
-        <Recent />
+        /> */}
+        <Recent conversations={conversations} />
         <TopSpaces />
+        <Feedback />
         <button
           onClick={onCollapseClick}
           onMouseOver={onshow}

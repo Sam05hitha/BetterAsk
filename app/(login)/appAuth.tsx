@@ -31,7 +31,6 @@ const initialState = {
 function check(user: TUser): boolean {
   const isEmailValid = isEmail(user.username);
   const isPassValid = user.password ? true : false;
-  console.log(isEmailValid && isPassValid);
   return isEmailValid && isPassValid;
 }
 

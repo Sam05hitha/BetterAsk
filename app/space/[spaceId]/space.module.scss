@@ -47,13 +47,14 @@
 }
 
 .space_page_container {
-  display: block;
   width: 100%;
   min-height: 100%;
   position: relative;
   padding: 10px 45px 40px;
   @extend %height;
   @extend %overflow;
+  background: url("../../../public/slide-bg.svg") repeat;
+  background-size: cover;
 }
 
 .no_navbar {
@@ -75,4 +76,9 @@
   font-size: 20px;
   display: flex;
   justify-content: space-between;
+}
+
+.space_page_chat_q_and_a {
+  display: flex;
+  flex-direction: column;
 }
