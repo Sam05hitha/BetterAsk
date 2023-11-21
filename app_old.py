@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from dotenv import load_dotenv
-from langchain.document_loaders import DirectoryLoader, PyMuPDFLoader
+from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -8,47 +8,12 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 import os
-from langchain.prompts import PromptTemplate
 import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Load environment variables from .env file
 load_dotenv()
-
-context = """
-Context: Addressing a PoSH-related concern in a multinational corporate environment.
-
-Example:
-Consider a Scenario, An employee reports feeling uncomfortable due to persistent inappropriate comments from a colleague in the workplace.
-
-Core Question: What are the recommended steps for an employee and the HR department in handling this situation in line with best PoSH practices? 
-
-Factors to consider while answering the question within 200 words be simple but cohesive,
-
-Critical Factors: Consider organizational PoSH policy, cultural sensitivities, and legal implications. 
-Response Characteristics: Comprehensive, nuanced, supportive, and non-judgmental. 
-Restrictions: Avoid direct legal advice. 
-Sensitivity Note: Respectful response with emotional impact consideration. 
-Actionable Advice: Outline practical steps and reporting protocols. 
-Supplementary Information: Relevant resources, training modules, or support services.
-
-"""
-
-prompt_template = """ 
-
-Hey !! I am BetterAsk, an AI tool that can give you answers about PoSH ( Prevention of Sexual Harassment to workplace)
-
-The following is a friendly conversation between a human and an AI. 
-
-{context}
-
-Question: {question}
-Answer:
-"""
-PROMPT = PromptTemplate(
-    template=prompt_template, input_variables=["context", "question"]
-)
 
 # Retrieve the OpenAI API key from the environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -127,28 +92,32 @@ def get_or_create_user_id(session_id):
 
     return user_id
 
-def get_pdf_docs(pdf_files):
+def get_pdf_text(pdf_files):
+    # Code to read text from PDF
+    text = ""
+    for pdf_file in pdf_files:
 
-    loader = DirectoryLoader(pdf_files, glob="**/*.pdf",
-                             loader_cls=PyMuPDFLoader)
+        print("Reading file: ", pdf_file)
 
-    return loader
+        with open(os.path.join("posh-docs", pdf_file), "rb") as file:
+            pdf_reader = PdfReader(file)
+            for page in pdf_reader.pages:
+                text += page.extract_text()
 
-def get_text_chunks(loader: DirectoryLoader):
+    return text
 
+def get_text_chunks(raw_text):
+    # Code to split the text into chunks
     text_splitter = CharacterTextSplitter(
-        separator="\n",
-        chunk_size=1000,
-        chunk_overlap=100,
-        length_function=len
+        separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len
     )
+    chunks = text_splitter.split_text(raw_text)
+    return chunks
 
-    docs = loader.load_and_split(text_splitter)
-    return docs
-
-def get_vectorstore(docs):
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(documents=docs, embedding=embeddings)
+def get_vectorstore(text_chunks):
+    # Code to get the vectorstore
+    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
 def get_conversation_chain(vectorstore):
@@ -162,9 +131,10 @@ def get_conversation_chain(vectorstore):
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
-        memory=memory,
-        combine_docs_chain_kwargs={'prompt': PROMPT}
+        memory=memory
     )
+
+    print(conversation_chain)
 
     return conversation_chain
 
@@ -172,7 +142,7 @@ def get_conversation_chain(vectorstore):
 async def process_documents():
     
     # Code to process the documents
-    raw_text = get_pdf_docs(os.listdir('posh-docs'))
+    raw_text = get_pdf_text(os.listdir('posh-docs'))
     text_chunks = get_text_chunks(raw_text)
     vectorstore = get_vectorstore(text_chunks)
 
