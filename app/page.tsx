@@ -26,7 +26,7 @@ export default function Home() {
   return (
     <main className={`${style.home_container} ${style.no_navbar} bg-primary`}>
       {/* <h1 className="font-inria text-5xl ">BetterAsk</h1>
-
+      
       <div className={style.home_spaces}>
         <div>
           {topSpaces.map((item) => (
@@ -46,6 +46,9 @@ export default function Home() {
           view more
         </Link>
       </div> */}
+      <header className=" absolute top-[20px] left-[20px] font-geo font-extrabold text-3xl">
+        BetterAsk
+      </header>
       <StartSpaceCard />
       <div className={style.home_bgImage}>
         <Image src={Hbg} priority alt="icon" />
