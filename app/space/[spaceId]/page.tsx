@@ -36,16 +36,9 @@ export default function SpaceWithID({ params }: INewChatModel) {
     if (response) refresh();
   }, [response]);
 
-  useEffect(() => {
-    async function process() {
-      await processDocuments();
-    }
-    process();
-  }, []);
-
   return (
     <div
-      className={`${style.space_page_outer_container} ${style.no_navbar} bg-secondary-200`}
+      className={`${style.space_page_outer_container} ${style.no_navbar} bg-primary-100`}
     >
       {/* <SpaceHeading title="Human Resources" link="/" /> */}
       <ChatContainer data={conversations} />

@@ -68,7 +68,6 @@ export default function StartSpaceCard() {
 
   function handleStartChatSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    processDocuments();
     setCookie();
     const session_id = getCookie();
 

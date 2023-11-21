@@ -56,16 +56,13 @@
 .message_footer {
   padding: 5px 10px;
   button {
-    color: rgba(108, 113, 129, 1);
+    color: black;
     transition: color 0.3s;
 
     svg {
       transform: scale(0.8);
     }
 
-    &:hover {
-      color: black;
-    }
     &:active {
       & svg {
         animation: thumbsUpAnimation 0.5s ease-in-out;

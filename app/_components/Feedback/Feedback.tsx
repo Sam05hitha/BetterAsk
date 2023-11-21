@@ -19,15 +19,17 @@ export default function Feedback() {
   }
   async function handleFeedbackSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    try {
-      const session_id = getCookie();
-      if (session_id) {
-        await sendFeedback(session_id, input);
+    if (input) {
+      try {
+        const session_id = getCookie();
+        if (session_id) {
+          await sendFeedback(session_id, input);
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setIsFeedbackSent(true);
       }
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsFeedbackSent(true);
     }
   }
 
