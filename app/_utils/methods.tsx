@@ -54,3 +54,12 @@ export const scrollToBottom = (ref: any) => {
     ref.current.scrollTop = ref.current.scrollHeight;
   }
 };
+
+export function formatMessage(text: string) {
+  if (!text) return;
+  const replacedText = text
+    .replace(/(?<!^)\n(?=\n)/g, "")
+    .replace(/(?<!^)\n/g, "<br />");
+    
+  return { __html: replacedText };
+}
