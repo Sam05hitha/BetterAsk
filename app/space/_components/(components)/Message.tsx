@@ -54,7 +54,7 @@ export default function Message({ isPending, isUser, data }: IMessage) {
       }`}
     >
       <div className={style.message_time}>
-        {!isPending && <span>{time}</span>}
+        {data.timestamp && <span>{time}</span>}
       </div>
       <div className={style.message_body}>
         <div

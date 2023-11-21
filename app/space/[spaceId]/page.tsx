@@ -41,7 +41,7 @@ export default function SpaceWithID({ params }: INewChatModel) {
         query: currentMessage,
         answer: "",
         converstaion_id: "",
-        timestamp: formatTimestampTo24Hour(currenMessageTime),
+        timestamp: "",
         user_id: 0,
       },
     ]);
