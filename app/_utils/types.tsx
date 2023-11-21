@@ -22,6 +22,7 @@ export type TOnChange = (event: ChangeEvent<HTMLInputElement>) => void;
 export type TOnSubmit = (event: FormEvent<HTMLFormElement>) => void;
 
 export type TConversation = {
+  isPending?: boolean;
   query: string;
   answer: string;
   converstaion_id: string | number;

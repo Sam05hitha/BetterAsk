@@ -21,6 +21,9 @@ export default function SpaceWithID({ params }: INewChatModel) {
   );
   const { response, error, getInputQuery, loadingQuery } = useSendQuery();
 
+  const [conversationsData, setConversationsData] =
+    useState<TConversation[]>(conversations);
+
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.currentTarget.value;
     setCurrentMassage(value ? value : "");
@@ -29,11 +32,21 @@ export default function SpaceWithID({ params }: INewChatModel) {
   function handleOnSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     getInputQuery(currentMessage);
+    // setConversationsData(prevData => ([...prevData, {
+    //   query: string;
+    // answer: string;
+    // converstaion_id: string | number;
+    // timestamp: string;
+    // user_id: number;
+    // }]))
     setCurrentMassage("");
   }
 
   useEffect(() => {
-    if (response) refresh();
+    if (response) {
+      setConversationsData(response);
+      refresh();
+    }
   }, [response]);
 
   return (

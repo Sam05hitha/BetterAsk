@@ -17,7 +17,7 @@ const config: Config = {
         text: "#000000",
         "text-100": "#6C7181C2",
         primary: "#718DF0",
-        "primary-100": "#6D8DFFC2",
+        "primary-100": "#859fff",
         secondary: "#FAFBFD",
         "secondary-100": "#f5f7ff",
         "secondary-200": "#C5D2FFEB",

@@ -11,6 +11,8 @@ interface TChatInput {
   value: string;
   placeHolder?: string;
   loading?: boolean;
+  custom?: string;
+  shadow?: boolean;
 }
 
 export default function ChatInput({
@@ -19,10 +21,14 @@ export default function ChatInput({
   value,
   placeHolder,
   loading,
+  custom,
+  shadow = true
 }: TChatInput) {
   return (
     <form
-      className={`${style.space_page_chat_input} bg-secondary-100`}
+      className={`${style.space_page_chat_input} ${custom ? custom : ""} ${
+        shadow ? style.shadow_on : ""
+      } bg-primary-100`}
       onSubmit={handleOnSubmit}
     >
       <div>
