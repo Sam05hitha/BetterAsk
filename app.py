@@ -63,7 +63,7 @@ DB_DB = os.getenv("POSTGRES_DB")
 # PostgreSQL connection settings
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DB}"
 
-print(DATABASE_URL)
+global_context_limit = 6
 
 # Create a connection to the DBQL database
 conn = psycopg2.connect(DATABASE_URL, sslmode='prefer')
@@ -87,6 +87,8 @@ class ChatSession:
     def __init__(self):
         self.conversation = None
         self.chat_history = []
+        self.current_context = 0
+        self.text_chunks = None
 
 # A global chat session.
 # Replace with a suitable data structure (like a dict) for multiple sessions
@@ -154,6 +156,9 @@ def get_vectorstore(text_chunks):
     # Code to get the vectorstore
     embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+
+    global_chat_session.current_context = 0
+
     return vectorstore
 
 def get_conversation_chain(vectorstore):
@@ -178,10 +183,14 @@ def get_conversation_chain(vectorstore):
 @app.post("/process-documents")
 async def process_documents():
     
+
+
     # Code to process the documents
-    raw_text = get_pdf_text(os.listdir('posh-docs'))
-    text_chunks = get_text_chunks(raw_text)
-    vectorstore = get_vectorstore(text_chunks)
+    if global_chat_session.current_context < global_context_limit:
+        raw_text = get_pdf_text(os.listdir('posh-docs'))
+        global_chat_session.text_chunks = get_text_chunks(raw_text)
+
+    vectorstore = get_vectorstore(global_chat_session.text_chunks)
 
     # Set the global_chat_session.conversation after processing documents
     global_chat_session.conversation = get_conversation_chain(vectorstore)
@@ -216,6 +225,11 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 async def chat(request: ChatRequest, conversation_id: int = None, _ : ChatSession = Depends(get_chat_session)):
+
+    if global_chat_session.current_context >= global_context_limit:
+        await process_documents()
+
+    global_chat_session.current_context += 1
 
     session_id = request.session_id
     query = request.query
@@ -264,6 +278,9 @@ async def clear_chat(request: ClearChatRequest, db: psycopg2.extensions.cursor =
 
     # Clear the conversation history for the specified user
     clear_query = "UPDATE users SET session_id = %s WHERE session_id = %s;"
+
+    print(clear_query)
+
     db.execute(clear_query, (new_session_id, session_id,))
     conn.commit()
 
