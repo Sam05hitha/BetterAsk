@@ -11,6 +11,42 @@ import os
 import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from langchain.prompts import PromptTemplate
+
+context = """
+Context: Addressing a PoSH-related concern in a multinational corporate environment.
+
+Example:
+Consider a Scenario, An employee reports feeling uncomfortable due to persistent inappropriate comments from a colleague in the workplace.
+
+Core Question: What are the recommended steps for an employee and the HR department in handling this situation in line with best PoSH practices? 
+
+Factors to consider while answering the question within 200 words be simple but cohesive,
+
+Critical Factors: Consider organizational PoSH policy, cultural sensitivities, and legal implications. 
+Response Characteristics: Comprehensive, nuanced, supportive, and non-judgmental. 
+Restrictions: Avoid direct legal advice. 
+Sensitivity Note: Respectful response with emotional impact consideration. 
+Actionable Advice: Outline practical steps and reporting protocols. 
+Supplementary Information: Relevant resources, training modules, or support services.
+
+"""
+
+prompt_template = """ 
+
+Hey !! I am BetterAsk, an AI tool that can give you answers about PoSH ( Prevention of Sexual Harassment to workplace)
+
+The following is a friendly conversation between a human and an AI. 
+
+{context}
+
+Question: {question}
+Answer:
+"""
+PROMPT = PromptTemplate(
+    template=prompt_template, input_variables=["context", "question"]
+)
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -131,10 +167,11 @@ def get_conversation_chain(vectorstore):
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
-        memory=memory
+        memory=memory,
+        combine_docs_chain_kwargs={'prompt': PROMPT}
     )
 
-    print(conversation_chain)
+    print(conversation_chain, )
 
     return conversation_chain
 
