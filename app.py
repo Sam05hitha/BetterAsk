@@ -12,6 +12,7 @@ import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
 
 context = """
 Context: Addressing a PoSH-related concern in a multinational corporate environment.
@@ -163,7 +164,7 @@ def get_vectorstore(text_chunks):
 
 def get_conversation_chain(vectorstore):
     # Code to get the conversation chain
-    llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
+    llm = OpenAI(model="gpt-3.5-turbo-instruct-0914", openai_api_key=OPENAI_API_KEY)
     memory = ConversationBufferMemory(
         memory_key='chat_history',
         return_messages=True
