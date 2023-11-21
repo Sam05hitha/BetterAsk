@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from dotenv import load_dotenv
-from PyPDF2 import PdfReader
+from langchain.document_loaders import DirectoryLoader, PyMuPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -8,10 +8,13 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 import os
+from langchain.prompts import PromptTemplate
 import psycopg2
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from langchain.prompts import PromptTemplate
+
+# Load environment variables from .env file
+load_dotenv()
 
 context = """
 Context: Addressing a PoSH-related concern in a multinational corporate environment.
@@ -46,10 +49,6 @@ Answer:
 PROMPT = PromptTemplate(
     template=prompt_template, input_variables=["context", "question"]
 )
-
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Retrieve the OpenAI API key from the environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -128,32 +127,28 @@ def get_or_create_user_id(session_id):
 
     return user_id
 
-def get_pdf_text(pdf_files):
-    # Code to read text from PDF
-    text = ""
-    for pdf_file in pdf_files:
+def get_pdf_docs(pdf_files):
 
-        print("Reading file: ", pdf_file)
+    loader = DirectoryLoader(pdf_files, glob="**/*.pdf",
+                             loader_cls=PyMuPDFLoader)
 
-        with open(os.path.join("posh-docs", pdf_file), "rb") as file:
-            pdf_reader = PdfReader(file)
-            for page in pdf_reader.pages:
-                text += page.extract_text()
+    return loader
 
-    return text
+def get_text_chunks(loader: DirectoryLoader):
 
-def get_text_chunks(raw_text):
-    # Code to split the text into chunks
     text_splitter = CharacterTextSplitter(
-        separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len
+        separator="\n",
+        chunk_size=1000,
+        chunk_overlap=100,
+        length_function=len
     )
-    chunks = text_splitter.split_text(raw_text)
-    return chunks
 
-def get_vectorstore(text_chunks):
-    # Code to get the vectorstore
-    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    docs = loader.load_and_split(text_splitter)
+    return docs
+
+def get_vectorstore(docs):
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents=docs, embedding=embeddings)
     return vectorstore
 
 def get_conversation_chain(vectorstore):
@@ -171,15 +166,13 @@ def get_conversation_chain(vectorstore):
         combine_docs_chain_kwargs={'prompt': PROMPT}
     )
 
-    print(conversation_chain, )
-
     return conversation_chain
 
 @app.post("/process-documents")
 async def process_documents():
     
     # Code to process the documents
-    raw_text = get_pdf_text(os.listdir('posh-docs'))
+    raw_text = get_pdf_docs(os.listdir('posh-docs'))
     text_chunks = get_text_chunks(raw_text)
     vectorstore = get_vectorstore(text_chunks)
 
