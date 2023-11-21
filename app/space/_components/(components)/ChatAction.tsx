@@ -51,6 +51,9 @@ export default function ChatAction() {
           showCollapseButton ? style.chatAction_container_hide_hovered : ""
         }`}
       >
+        <h1 className="mb-[10px] font-geo font-extrabold text-3xl">
+          BetterAsk
+        </h1>
         {/* <ActionButtons
           spaces
           custom={["w-[100%]", "w-[50px] h-[50px] flex-shrink-0"]}

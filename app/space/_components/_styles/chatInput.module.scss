@@ -8,7 +8,8 @@
   justify-content: center;
   align-items: center;
   padding: 0 45px 20px;
-  box-shadow: -10px -20px 40px 10px white;
+  border-radius: 0 0 10px 10px;
+  // box-shadow: -10px -20px 40px 10px white;
 
   > div {
     position: relative;
@@ -42,6 +43,21 @@
     }
   }
 }
+
+
+.shadow_on {
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    box-shadow: inset 0 -10px 10px #859fff;
+  }
+}
+
 
 .space_send_button_pulse {
   animation: pulse 2s infinite;

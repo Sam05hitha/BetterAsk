@@ -119,6 +119,8 @@ export default function StartSpaceCard() {
                     <span className="font-medium">Back</span>
                   </button>
                   <ChatInput
+                    shadow={false}
+                    custom="bg-white"
                     loading={loadingQuery}
                     placeHolder="Ask me anything about posh"
                     handleOnChange={handleStartChatInput}
