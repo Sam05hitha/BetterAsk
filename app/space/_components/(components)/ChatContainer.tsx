@@ -23,7 +23,7 @@ export default function ChatContainer({ data }: IChatContainer) {
         data?.map((item: any, index: any) => (
           <div key={index} className={style.space_page_chat_q_and_a}>
             <Message data={item} isUser={true} />
-            <Message data={item} isUser={false} />
+            <Message isPending={item?.isPending} data={item} isUser={false} />
           </div>
         ))
       ) : (

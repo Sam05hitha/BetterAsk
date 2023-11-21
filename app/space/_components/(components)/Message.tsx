@@ -10,13 +10,16 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import { sendResponseFeedback } from "@/app/_services/commonApis";
+import Image from "next/image";
+import loadingIcon from "../../../../public/loading-dots.gif";
 
 interface IMessage {
   isUser: boolean;
   data: TConversation;
+  isPending?: boolean;
 }
 
-export default function Message({ isUser, data }: IMessage) {
+export default function Message({ isPending, isUser, data }: IMessage) {
   const time = formatTimestampTo24Hour(data?.timestamp);
   const answer = data.answer ? data.answer : "Please retry";
   const [copied, setCopied] = useState<boolean>(false);
@@ -51,7 +54,7 @@ export default function Message({ isUser, data }: IMessage) {
       }`}
     >
       <div className={style.message_time}>
-        <span>{time}</span>
+        {data.timestamp && <span>{time}</span>}
       </div>
       <div className={style.message_body}>
         <div
@@ -61,9 +64,21 @@ export default function Message({ isUser, data }: IMessage) {
         >
           {isUser ? <AccountCircleIcon /> : "Better Ask"}{" "}
         </div>
-        <p className={style.message_text}>{isUser ? data.query : answer}</p>
+        {isUser ? (
+          <p className={style.message_text}>{data.query}</p>
+        ) : (
+          <>
+            {isPending ? (
+              <div className={style.message_isGenerating}>
+                <Image src={loadingIcon} alt="" width={40} height={40} />
+              </div>
+            ) : (
+              <p className={style.message_text}>{answer}</p>
+            )}
+          </>
+        )}
       </div>
-      {!isUser && (
+      {!isUser && !isPending && (
         <div className={style.message_footer}>
           <button onClick={() => handleCopyToClipboard(answer)}>
             {copied ? <FileCopyIcon /> : <FileCopyOutlinedIcon />}
