@@ -77,13 +77,13 @@ async def get_db_cursor():
 def get_or_create_user_id(session_id):
 
     # Check if the user exists in the 'users' table
-    check_user_query = "SELECT id FROM users WHERE email = %s;"
+    check_user_query = "SELECT id FROM users WHERE session_id = %s;"
     cursor.execute(check_user_query, (session_id,))
     user_result = cursor.fetchone()
 
     # If the user doesn't exist, create a new user
     if user_result is None:
-        create_user_query = "INSERT INTO users (email) VALUES (%s) RETURNING id;"
+        create_user_query = "INSERT INTO users (session_id) VALUES (%s) RETURNING id;"
         cursor.execute(create_user_query, (session_id,))
         user_id = cursor.fetchone()[0]
         conn.commit()
@@ -221,11 +221,13 @@ class ClearChatRequest(BaseModel):
 @app.post("/clear-chat")
 async def clear_chat(request: ClearChatRequest, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
     
-    user_id = get_or_create_user_id(request.session_id)
+    session_id = request.session_id
+
+    new_session_id = "D-" + session_id + "-D"
 
     # Clear the conversation history for the specified user
-    clear_query = "UPDATE user_conversation_history SET user_id = -1 WHERE user_id = %s;"
-    db.execute(clear_query, (user_id,))
+    clear_query = "UPDATE users SET session_id = %s WHERE session_id = %s;"
+    db.execute(clear_query, (new_session_id, session_id,))
     conn.commit()
 
     return {"message": "Conversation history cleared successfully."}
@@ -265,6 +267,10 @@ async def submit_user_response_feedback(response_feedback: UserResponseFeedback,
     return {"message": "User response feedback submitted successfully.", "response_feedback_id": response_feedback_id}
 
 if __name__ == "__main__":
+    async def startup():
+        print("Starting up...")
+        await process_documents()
+
+    app.add_event_handler("startup", startup)
     import uvicorn
-    # Run the FastAPI application using Uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
