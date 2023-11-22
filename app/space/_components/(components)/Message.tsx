@@ -3,7 +3,11 @@
 import React, { useState } from "react";
 import style from "../_styles/message.module.scss";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { formatTimestampTo24Hour, getCookie } from "@/app/_utils/methods";
+import {
+  formatMessage,
+  formatTimestampTo24Hour,
+  getCookie,
+} from "@/app/_utils/methods";
 import { TConversation } from "@/app/_utils/types";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -21,9 +25,13 @@ interface IMessage {
 
 export default function Message({ isPending, isUser, data }: IMessage) {
   const time = formatTimestampTo24Hour(data?.timestamp);
-  const answer = data.answer ? data.answer : "Please retry";
+  const answer = data.answer
+    ? data.answer
+    : "Oops!, This resulted in Error, Please retry.";
   const [copied, setCopied] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
+
+  const formattedString = formatMessage(answer); //{ __html: answer.replace(/(?<!^)\n/g, "<br />") };
 
   async function handleLike() {
     if (!liked) {
@@ -73,7 +81,10 @@ export default function Message({ isPending, isUser, data }: IMessage) {
                 <Image src={loadingIcon} alt="" width={40} height={40} />
               </div>
             ) : (
-              <p className={style.message_text}>{answer}</p>
+              <p
+                className={style.message_text}
+                dangerouslySetInnerHTML={formattedString}
+              />
             )}
           </>
         )}

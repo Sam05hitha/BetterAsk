@@ -29,3 +29,10 @@ button:disabled {
   filter: opacity(0.5);
   color: #6c7181c2;
 }
+
+br {
+  display: block; /* Change the default inline behavior to block */
+  content: "\00a0"; /* Add a non-breaking space content to create a visible effect (optional) */
+  margin-bottom: 10px; /* Add margin at the bottom */
+  line-height: 20px; /* Adjust line height as needed */
+}
