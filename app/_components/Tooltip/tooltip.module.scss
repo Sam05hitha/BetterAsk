@@ -1,3 +1,5 @@
+@import "../../../styles//abstracts/mixins";
+
 .tooltip_container {
   display: none;
   color: white;
@@ -29,8 +31,16 @@
 
 .tooltip_floating {
   @extend %tooltip;
+  
+  @include mobileStyles {
+    display: none;
+  }
 }
 
 .tooltip_visible {
   display: block;
+
+  @include mobileStyles {
+    display: none;
+  }
 }

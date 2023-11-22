@@ -1,3 +1,5 @@
+@import "../../../../styles//abstracts/mixins";
+
 .space_page_chat_input {
   width: calc(100%);
   position: sticky;
@@ -11,6 +13,10 @@
   border-radius: 0 0 10px 10px;
   // box-shadow: -10px -20px 40px 10px white;
 
+  @include mobileStyles {
+    padding: 0 10px 10px;
+  }
+
   > div {
     position: relative;
     width: 100%;
@@ -18,7 +24,7 @@
 
   & input {
     width: 100%;
-    padding: 13px 20px;
+    padding: 13px 60px 13px 20px;
     border-radius: 10px;
     box-shadow: 0 0 0 1px black;
 
@@ -29,13 +35,23 @@
 
   & button {
     position: absolute;
-    top: 9px;
+    top: 10px;
     right: 20px;
+
+        
+    @include mobileStyles { 
+      top: 12px;
+    }
 
     > div {
       position: relative;
       width: 30px;
       height: 30px;
+      
+      @include mobileStyles {
+        width: 25px;
+        height: 25px;
+      }
     }
 
     &:not(:disabled):active {
@@ -44,9 +60,7 @@
   }
 }
 
-
 .shadow_on {
-
   &::before {
     content: "";
     position: absolute;
@@ -57,7 +71,6 @@
     box-shadow: inset 0 -10px 10px #859fff;
   }
 }
-
 
 .space_send_button_pulse {
   animation: pulse 2s infinite;

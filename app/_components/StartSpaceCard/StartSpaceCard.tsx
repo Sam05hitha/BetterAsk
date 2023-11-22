@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import style from "./start_space_card.module.scss";
 import KeyboardBackspaceRoundedIcon from "@mui/icons-material/KeyboardBackspaceRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import { ChatInput } from "@/app/space/_components";
 import { useRouter } from "next/navigation";
 import { getCookie, setCookie } from "@/app/_utils/methods";
-import { processDocuments } from "@/app/_services/getUsers";
 import useSendQuery from "@/app/_hooks/useSendQuery";
 
 const slides = [
@@ -35,6 +34,7 @@ export default function StartSpaceCard() {
   const [slide, setSlide] = useState<ISlide>({
     slideId: 0,
   });
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [startChatInputValue, setStartChatInputValue] = useState<string>("");
   const { response, error, getInputQuery, loadingQuery } = useSendQuery();
 
@@ -69,6 +69,7 @@ export default function StartSpaceCard() {
   function handleStartChatSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setCookie();
+    inputRef.current?.blur();
     const session_id = getCookie();
 
     if (session_id) {
@@ -119,6 +120,7 @@ export default function StartSpaceCard() {
                     <span className="font-medium">Back</span>
                   </button>
                   <ChatInput
+                    inputRef={inputRef}
                     shadow={false}
                     custom="bg-white"
                     loading={loadingQuery}

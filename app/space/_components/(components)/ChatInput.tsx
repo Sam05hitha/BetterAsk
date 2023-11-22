@@ -13,6 +13,7 @@ interface TChatInput {
   loading?: boolean;
   custom?: string;
   shadow?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement> | null;
 }
 
 export default function ChatInput({
@@ -22,7 +23,8 @@ export default function ChatInput({
   placeHolder,
   loading,
   custom,
-  shadow = true
+  shadow = true,
+  inputRef,
 }: TChatInput) {
   return (
     <form
@@ -33,6 +35,7 @@ export default function ChatInput({
     >
       <div>
         <input
+          ref={inputRef}
           value={value}
           placeholder={placeHolder || "Enter your message here"}
           type="text"

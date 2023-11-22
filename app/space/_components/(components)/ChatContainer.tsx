@@ -4,7 +4,10 @@ import React, { useRef, useEffect } from "react";
 import { Message } from "..";
 import style from "../../[spaceId]/space.module.scss";
 import { TConversation } from "@/app/_utils/types";
-import { handleScrollIntoView, scrollToBottom } from "@/app/_utils/methods";
+import {
+  handleScrollIntoView,
+  scrollToBottom,
+} from "@/app/_utils/methods";
 
 interface IChatContainer {
   data: TConversation[];
@@ -15,7 +18,6 @@ export default function ChatContainer({ data }: IChatContainer) {
   const answerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // scrollToBottom(chatContainerRef);
     handleScrollIntoView(answerRef);
   }, [data]);
 
