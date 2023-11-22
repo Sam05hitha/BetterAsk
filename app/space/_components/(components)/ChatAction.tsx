@@ -1,20 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import style from "../_styles/chatAction.module.scss";
 import { Recent, TopSpaces } from "..";
 import { useRouter } from "next/navigation";
 import { ActionButtons, Feedback, ToolTip } from "@/app/_components";
 import useTooltip from "@/app/_hooks/useTooltip";
 import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
-import useConversation from "@/app/_hooks/useConversation";
 import { getCookie } from "@/app/_utils/methods";
 import { clearChat } from "@/app/_services/commonApis";
+import { AppContext } from "@/app/_context/appContext";
 
 export default function ChatAction() {
   const router = useRouter();
-  const session_id = getCookie();
-  const { conversations, isLoading, refresh } = useConversation(session_id);
+  const {
+    appState: { conversations },
+  } = useContext(AppContext);
+
   const [showCollapseButton, onshow, onHide] = useTooltip();
   const [collapse, setCollapse] = useState<boolean>(false);
 
@@ -25,6 +27,7 @@ export default function ChatAction() {
   function handleGoBack() {
     router.back();
   }
+  
 
   function handleCreateSpace() {
     // TODO create new chat channel

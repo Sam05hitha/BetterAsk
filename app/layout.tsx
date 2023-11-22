@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geologica } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./_components";
+import AppWrap from "./_context/AppWrap";
 
 const geo = Geologica({
   weight: "400",
@@ -37,7 +38,7 @@ export default function RootLayout({
         className={`${geo.className} ${geoBold.variable} ${geoMedium.variable}`}
       >
         {/* <Navbar /> */}
-        {children}
+        <AppWrap>{children}</AppWrap>
       </body>
     </html>
   );

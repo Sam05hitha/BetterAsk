@@ -1,8 +1,9 @@
 import { getQueryApi } from "../_services/getUsers";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TConversation } from "../_utils/types";
 import { getConversations } from "../_services/getConversation";
 import { getCookie } from "../_utils/methods";
+import { AppContext } from "../_context/appContext";
 
 const fetcher = async (url: string) => {
   const response = await getQueryApi.get(url);
@@ -13,6 +14,7 @@ export default function useConversation(session_id: string | null) {
   const [data, setData] = useState<TConversation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>("");
+  const { updateConversations } = useContext(AppContext);
 
   async function refreshConversations() {
     const sessionId = getCookie();
@@ -23,7 +25,8 @@ export default function useConversation(session_id: string | null) {
           const response = await getConversations(sessionId);
 
           setData(response.data?.conversation_chain);
-          
+          updateConversations(response.data?.conversation_chain);
+
           if (response) {
             setLoading(false);
           }
