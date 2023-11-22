@@ -1,8 +1,14 @@
+@import "../../../../styles/abstracts/mixins";
+
 .message_container {
   font-size: 13px;
   margin-bottom: 10px;
   width: max-content;
   max-width: 800px;
+
+  @include mobileStyles {
+    max-width: calc(100vw - 60px);
+  }
 }
 
 .message_container_isUser {
@@ -27,6 +33,11 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+
+  @include mobileStyles {
+    flex-direction: column;
+    padding: 10px 20px;
+  }
 }
 
 .message_avatar {
@@ -42,10 +53,26 @@
   border-radius: 10px;
   font-weight: bold;
   text-align: center;
+
+  @include mobileStyles {
+    &:not(.message_avatar_isUser) {
+      width: max-content;
+      height: 30px;
+      font-size: 12px;
+      color: black;
+      margin-bottom: 5px;
+      background-color: white;
+      border-radius: 0;
+    }
+  }
 }
 
 .message_avatar_isUser {
   background-color: lightgray;
+
+  @include mobileStyles {
+    display: none;
+  }
 }
 
 .message_text {
@@ -92,4 +119,8 @@
   position: relative;
   transform: scale(0.7);
   padding-top: 5px;
+
+  @include mobileStyles {
+    padding: 0;
+  }
 }

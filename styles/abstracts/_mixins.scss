@@ -1,0 +1,28 @@
+@import "./variables";
+
+@mixin mobileStyles {
+  @media (max-width: $mobile) {
+    @content;
+  }
+}
+
+// Use a mixin for tablet styles
+@mixin tabletStyles {
+  @media (min-width: $mobile + 1) and (max-width: $tablet) {
+    @content;
+  }
+}
+
+// Use a mixin for desktop styles
+@mixin desktopStyles {
+  @media (min-width: $tablet + 1) and (max-width: $desktop) {
+    @content;
+  }
+}
+
+// Use a mixin for large desktop styles
+@mixin largeDesktopStyles {
+  @media (min-width: $desktop + 1) {
+    @content;
+  }
+}

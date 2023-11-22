@@ -1,3 +1,5 @@
+@import "../../../../styles/abstracts/mixins";
+
 .chatAction_container {
   padding: 10px;
   width: 20%;
@@ -6,6 +8,19 @@
   position: relative;
   border-radius: 10px;
   opacity: 1;
+
+  @include mobileStyles {
+    width: 0px;
+    min-width: 0px;
+    padding: 0;
+
+    & h1 {
+      display: none;
+    }
+    & * :not(.collapse_sidebar_button, & button div, & button *) {
+      display: none;
+    }
+  }
 }
 
 .chatAction_container_hide_hovered {
@@ -23,6 +38,10 @@
     );
     z-index: 1;
     border-radius: 10px;
+
+    @include mobileStyles {
+      z-index: -1;
+    }
   }
 }
 
@@ -52,31 +71,55 @@
     opacity: 1;
     z-index: 100;
   }
+
+  @include mobileStyles {
+    opacity: 1;
+    right: -25px;
+    transform: scale(1.5, 2);
+  }
 }
 
 .no_navbar {
   min-height: calc(100vh - 60px);
   max-height: calc(100vh - 60px);
+
+  @include mobileStyles {
+    min-height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+  }
 }
 
 .collapsed_sidebar {
   width: 0;
-  transition: all 0.3s;
+  transition: all 0.2s;
   padding: 0;
-
-  & h1 {
-    opacity: 0.5;
-  }
-
-  & *:not(.collapse_sidebar_button, & button div, & button svg) {
-    opacity: 0.5;
-  }
 
   & h1 {
     display: none;
   }
   & * :not(.collapse_sidebar_button, & button div, & button *) {
     display: none;
+  }
+
+  @include mobileStyles {
+    min-width: 350px;
+    transition: none;
+    padding: 10px;
+
+    & h1 {
+      display: block;
+    }
+    & * :not(.collapse_sidebar_button, & button div, & button *) {
+      display: block;
+
+      & div {
+       display: flex;
+      }
+
+      & a {
+        display: flex;
+      }
+    }
   }
 }
 
