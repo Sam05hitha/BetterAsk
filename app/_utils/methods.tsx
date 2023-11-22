@@ -68,3 +68,13 @@ export function formatMessage(text: string) {
 
   return { __html: outputString };
 }
+export function newPendingMessage(currentMessage: string) {
+  return {
+    isPending: true,
+    query: currentMessage,
+    answer: "",
+    converstaion_id: "",
+    timestamp: "",
+    user_id: 0,
+  };
+}

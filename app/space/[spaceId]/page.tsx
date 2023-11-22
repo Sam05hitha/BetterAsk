@@ -5,10 +5,11 @@ import style from "./space.module.scss";
 import { ChatContainer, ChatInput, SpaceHeading } from "../_components";
 import useConversation from "@/app/_hooks/useConversation";
 import useSendQuery from "@/app/_hooks/useSendQuery";
-import { CONVERSATIONS } from "@/app/_utils/constants";
 import { TConversation } from "@/app/_utils/types";
-import { processDocuments } from "@/app/_services/getUsers";
-import { formatTimestampTo24Hour } from "@/app/_utils/methods";
+import {
+  formatTimestampTo24Hour,
+  newPendingMessage,
+} from "@/app/_utils/methods";
 
 interface INewChatModel {
   searchParams?: { chatStartInput: string | undefined | null };
@@ -33,16 +34,11 @@ export default function SpaceWithID({ params }: INewChatModel) {
   function handleOnSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     getInputQuery(currentMessage);
-    const currenMessageTime = new Date().toLocaleTimeString();
+
     setConversationsData((prevData) => [
       ...prevData,
       {
-        isPending: true,
-        query: currentMessage,
-        answer: "",
-        converstaion_id: "",
-        timestamp: "",
-        user_id: 0,
+        ...newPendingMessage(currentMessage),
       },
     ]);
     setCurrentMassage("");
