@@ -18,12 +18,18 @@ import Image from "next/image";
 import loadingIcon from "../../../../public/loading-dots.gif";
 
 interface IMessage {
+  answerRef?: React.RefObject<HTMLDivElement> | null;
   isUser: boolean;
   data: TConversation;
   isPending?: boolean;
 }
 
-export default function Message({ isPending, isUser, data }: IMessage) {
+export default function Message({
+  answerRef,
+  isPending,
+  isUser,
+  data,
+}: IMessage) {
   const time = formatTimestampTo24Hour(data?.timestamp);
   const answer = data.answer
     ? data.answer
@@ -57,6 +63,7 @@ export default function Message({ isPending, isUser, data }: IMessage) {
 
   return (
     <div
+      ref={answerRef}
       className={`${style.message_container} font-geo ${
         isUser ? style.message_container_isUser : ""
       }`}

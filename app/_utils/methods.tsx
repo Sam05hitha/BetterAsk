@@ -1,4 +1,5 @@
 import cookie from "cookie";
+import { RefObject } from "react";
 
 export function setCookie() {
   const options = { maxAge: 60 * 60 * 24 * 3 };
@@ -52,6 +53,12 @@ export function extractIdFromPath(path: string) {
 export const scrollToBottom = (ref: any) => {
   if (ref.current) {
     ref.current.scrollTop = ref.current.scrollHeight;
+  }
+};
+
+export const handleScrollIntoView = (ref: RefObject<HTMLDivElement>) => {
+  if (ref.current) {
+    ref.current.scrollIntoView({ behavior: "smooth" });
   }
 };
 
