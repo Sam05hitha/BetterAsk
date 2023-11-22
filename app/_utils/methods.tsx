@@ -60,6 +60,11 @@ export function formatMessage(text: string) {
   const replacedText = text
     .replace(/(?<!^)\n(?=\n)/g, "")
     .replace(/(?<!^)\n/g, "<br />");
-    
-  return { __html: replacedText };
+
+  // let match = replacedText.match(/(\d+\..*?:)/);
+  let outputString = replacedText.replace(/(\d+\..*?:)/g, function (match) {
+    return "<b>" + match + "</b>";
+  });
+
+  return { __html: outputString };
 }
