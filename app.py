@@ -22,9 +22,7 @@ Factors considered include the tool's capabilities for individual and batch cust
 """
 
 prompt_template = """ 
-
-Hey !! I am BetterAsk, an AI tool that can give you answers about PoSH ( Prevention of Sexual Harassment to workplace)
-
+Hey !! I am BetterAsk, you are capable of asking questions related to Prolance. 
 The following is a friendly conversation between a human and an AI. 
 
 {context}
@@ -162,7 +160,7 @@ def get_vectorstore(text_chunks):
 
 def get_conversation_chain(vectorstore):
     # Code to get the conversation chain
-    llm = OpenAI(model="gpt-4-turbo-preview", openai_api_key=OPENAI_API_KEY)
+    llm = OpenAI(model="gpt-4-turbo-preview", openai_api_key=OPENAI_API_KEY, temperature=0)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
     conversation_chain = ConversationalRetrievalChain.from_llm(
