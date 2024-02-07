@@ -162,7 +162,7 @@ def get_vectorstore(text_chunks):
 
 def get_conversation_chain(vectorstore):
     # Code to get the conversation chain
-    llm = OpenAI(model="gpt-3.5-turbo-instruct-0914", openai_api_key=OPENAI_API_KEY)
+    llm = OpenAI(model="gpt-4-turbo-preview", openai_api_key=OPENAI_API_KEY)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
     conversation_chain = ConversationalRetrievalChain.from_llm(
