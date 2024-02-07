@@ -15,22 +15,10 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
 context = """
-Context: Addressing a PoSH-related concern in a multinational corporate environment.
-
-Example:
-Consider a Scenario, An employee reports feeling uncomfortable due to persistent inappropriate comments from a colleague in the workplace.
-
-Core Question: What are the recommended steps for an employee and the HR department in handling this situation in line with best PoSH practices? 
-
-Factors to consider while answering the question within 200 words be simple but cohesive,
-
-Critical Factors: Consider organizational PoSH policy, cultural sensitivities, and legal implications. 
-Response Characteristics: Comprehensive, nuanced, supportive, and non-judgmental. 
-Restrictions: Avoid direct legal advice. 
-Sensitivity Note: Respectful response with emotional impact consideration. 
-Actionable Advice: Outline practical steps and reporting protocols. 
-Supplementary Information: Relevant resources, training modules, or support services.
-
+Context: A software tool designed for cabinet and wardrobe customization, enabling users to modify accessories, materials, and colors, and generate detailed layouts and quotes.
+Example: Customizing the exposed side of a panel involves selecting the cabinet, then changing the panel color by selecting the exposed panel color option.
+Core Question: How can one efficiently customize and manage cabinet and wardrobe designs using the described software tool?
+Factors considered include the tool's capabilities for individual and batch customization of components, generation of 2D layouts and elevation views, adjustment of component dimensions and styles, application of global settings for materials and styles, detailed customization options (e.g., edge bending, mirror placements), efficient modifications through batch styles, management of project paths and hardware settings, and the calculation of pricing and margins for quotations. These functionalities are crucial for streamlining the design process, enhancing design flexibility, and managing design projects effectively.
 """
 
 prompt_template = """ 
@@ -67,7 +55,7 @@ DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DB
 global_context_limit = 6
 
 # Create a connection to the DBQL database
-conn = psycopg2.connect(DATABASE_URL, sslmode='prefer')
+conn = psycopg2.connect(DATABASE_URL, sslmode="prefer")
 
 # Create a cursor object to interact with the database
 cursor = conn.cursor()
@@ -84,6 +72,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+
 class ChatSession:
     def __init__(self):
         self.conversation = None
@@ -91,27 +80,32 @@ class ChatSession:
         self.current_context = 0
         self.text_chunks = None
 
+
 # A global chat session.
 # Replace with a suitable data structure (like a dict) for multiple sessions
 global_chat_session = ChatSession()
 
+
 async def get_conversation(query):
     if global_chat_session.conversation is None:
         raise HTTPException(status_code=400, detail="No documents processed yet")
-    return global_chat_session.conversation({'question': query})
+    return global_chat_session.conversation({"question": query})
+
 
 def get_chat_session():
     return ChatSession()
 
+
 # Dependency to get the database cursor
 async def get_db_cursor():
-    db = psycopg2.connect(DATABASE_URL, sslmode='prefer')
+    db = psycopg2.connect(DATABASE_URL, sslmode="prefer")
     cursor = db.cursor()
     try:
         yield cursor
     finally:
         cursor.close()
         db.close()
+
 
 def get_or_create_user_id(session_id):
 
@@ -131,6 +125,7 @@ def get_or_create_user_id(session_id):
 
     return user_id
 
+
 def get_pdf_text(pdf_files):
     # Code to read text from PDF
     text = ""
@@ -145,6 +140,7 @@ def get_pdf_text(pdf_files):
 
     return text
 
+
 def get_text_chunks(raw_text):
     # Code to split the text into chunks
     text_splitter = CharacterTextSplitter(
@@ -152,6 +148,7 @@ def get_text_chunks(raw_text):
     )
     chunks = text_splitter.split_text(raw_text)
     return chunks
+
 
 def get_vectorstore(text_chunks):
     # Code to get the vectorstore
@@ -162,33 +159,32 @@ def get_vectorstore(text_chunks):
 
     return vectorstore
 
+
 def get_conversation_chain(vectorstore):
     # Code to get the conversation chain
     llm = OpenAI(model="gpt-3.5-turbo-instruct-0914", openai_api_key=OPENAI_API_KEY)
-    memory = ConversationBufferMemory(
-        memory_key='chat_history',
-        return_messages=True
-    )
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
         memory=memory,
-        combine_docs_chain_kwargs={'prompt': PROMPT}
+        combine_docs_chain_kwargs={"prompt": PROMPT},
     )
 
-    print(conversation_chain, )
+    print(
+        conversation_chain,
+    )
 
     return conversation_chain
 
+
 @app.post("/process-documents")
 async def process_documents():
-    
-
 
     # Code to process the documents
     if global_chat_session.current_context < global_context_limit:
-        raw_text = get_pdf_text(os.listdir('posh-docs'))
+        raw_text = get_pdf_text(os.listdir("posh-docs"))
         global_chat_session.text_chunks = get_text_chunks(raw_text)
 
     vectorstore = get_vectorstore(global_chat_session.text_chunks)
@@ -196,13 +192,19 @@ async def process_documents():
     # Set the global_chat_session.conversation after processing documents
     global_chat_session.conversation = get_conversation_chain(vectorstore)
 
-    return {"message": "Documents processed. Start asking questions using /chat/<query>"}
+    return {
+        "message": "Documents processed. Start asking questions using /chat/<query>"
+    }
+
 
 class UserSession(BaseModel):
     session_id: str
 
+
 @app.post("/get-conversation-history")
-async def get_user_conversation_history(session: UserSession, _ : psycopg2.extensions.cursor = Depends(get_db_cursor)):
+async def get_user_conversation_history(
+    session: UserSession, _: psycopg2.extensions.cursor = Depends(get_db_cursor)
+):
 
     session_id = session.session_id
 
@@ -216,16 +218,30 @@ async def get_user_conversation_history(session: UserSession, _ : psycopg2.exten
     # Reconstruct the conversation chain
     conversation_chain = []
     for row in history:
-        conversation_chain.append({"query": row[0], "answer": row[1], "user_id": row[2],  "timestamp": row[3], "converstaion_id": row[4]})
+        conversation_chain.append(
+            {
+                "query": row[0],
+                "answer": row[1],
+                "user_id": row[2],
+                "timestamp": row[3],
+                "converstaion_id": row[4],
+            }
+        )
 
     return {"conversation_chain": conversation_chain}
+
 
 class ChatRequest(BaseModel):
     query: str
     session_id: str
 
+
 @app.post("/chat")
-async def chat(request: ChatRequest, conversation_id: int = None, _ : ChatSession = Depends(get_chat_session)):
+async def chat(
+    request: ChatRequest,
+    conversation_id: int = None,
+    _: ChatSession = Depends(get_chat_session),
+):
 
     if global_chat_session.current_context >= global_context_limit:
         await process_documents()
@@ -255,24 +271,41 @@ async def chat(request: ChatRequest, conversation_id: int = None, _ : ChatSessio
     # Reconstruct the conversation chain
     conversation_chain = []
     for row in history:
-        conversation_chain.append({"user_id": user_id, "converstaion_id": conversation_id,"query": row[0], "answer": row[1]})
+        conversation_chain.append(
+            {
+                "user_id": user_id,
+                "converstaion_id": conversation_id,
+                "query": row[0],
+                "answer": row[1],
+            }
+        )
 
     # Call the `get_conversation` method of the chat session
     response = await get_conversation(query)
 
     # Insert the new response into the database
-    update_query = "UPDATE user_conversation_history SET assistant_response = %s WHERE id = %s;"
+    update_query = (
+        "UPDATE user_conversation_history SET assistant_response = %s WHERE id = %s;"
+    )
     cursor.execute(update_query, (response["answer"], conversation_id))
     conn.commit()
 
-    return {"answer": response["answer"], "conversation_id": conversation_id, "user_id": user_id}
+    return {
+        "answer": response["answer"],
+        "conversation_id": conversation_id,
+        "user_id": user_id,
+    }
+
 
 class ClearChatRequest(BaseModel):
     session_id: str
 
+
 @app.post("/clear-chat")
-async def clear_chat(request: ClearChatRequest, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
-    
+async def clear_chat(
+    request: ClearChatRequest, db: psycopg2.extensions.cursor = Depends(get_db_cursor)
+):
+
     session_id = request.session_id
 
     new_session_id = "D-" + session_id + "-D"
@@ -282,17 +315,27 @@ async def clear_chat(request: ClearChatRequest, db: psycopg2.extensions.cursor =
 
     print(clear_query)
 
-    db.execute(clear_query, (new_session_id, session_id,))
+    db.execute(
+        clear_query,
+        (
+            new_session_id,
+            session_id,
+        ),
+    )
     conn.commit()
 
     return {"message": "Conversation history cleared successfully."}
+
 
 class UserFeedback(BaseModel):
     session_id: str
     user_feedback: str
 
+
 @app.post("/feedback")
-async def submit_user_feedback(feedback: UserFeedback, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+async def submit_user_feedback(
+    feedback: UserFeedback, db: psycopg2.extensions.cursor = Depends(get_db_cursor)
+):
     user_id = get_or_create_user_id(feedback.session_id)
 
     # Insert user feedback into the database
@@ -301,7 +344,11 @@ async def submit_user_feedback(feedback: UserFeedback, db: psycopg2.extensions.c
     feedback_id = db.fetchone()[0]
     conn.commit()
 
-    return {"message": "User feedback submitted successfully.", "feedback_id": feedback_id}
+    return {
+        "message": "User feedback submitted successfully.",
+        "feedback_id": feedback_id,
+    }
+
 
 class UserResponseFeedback(BaseModel):
     session_id: str
@@ -309,23 +356,41 @@ class UserResponseFeedback(BaseModel):
     like_dislike: bool
     response_feedback: str
 
+
 @app.post("/response-feedback")
-async def submit_user_response_feedback(response_feedback: UserResponseFeedback, db: psycopg2.extensions.cursor = Depends(get_db_cursor)):
+async def submit_user_response_feedback(
+    response_feedback: UserResponseFeedback,
+    db: psycopg2.extensions.cursor = Depends(get_db_cursor),
+):
     user_id = get_or_create_user_id(response_feedback.session_id)
 
     # Insert user response feedback into the database
     insert_query = "INSERT INTO user_response_feedback (user_id, conversation_id, response_feedback_id, like_dislike, response_feedback) VALUES (%s, %s, DEFAULT, %s, %s) RETURNING id;"
-    db.execute(insert_query, (user_id, response_feedback.conversation_id, response_feedback.like_dislike, response_feedback.response_feedback))
+    db.execute(
+        insert_query,
+        (
+            user_id,
+            response_feedback.conversation_id,
+            response_feedback.like_dislike,
+            response_feedback.response_feedback,
+        ),
+    )
     response_feedback_id = db.fetchone()[0]
     conn.commit()
 
-    return {"message": "User response feedback submitted successfully.", "response_feedback_id": response_feedback_id}
+    return {
+        "message": "User response feedback submitted successfully.",
+        "response_feedback_id": response_feedback_id,
+    }
+
 
 if __name__ == "__main__":
+
     async def startup():
         print("Starting up...")
         await process_documents()
 
     app.add_event_handler("startup", startup)
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
