@@ -6,6 +6,9 @@
   border-radius: 10px;
   background-color: white;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  background-color: transparent;
 
   @include mobileStyles {
     width: calc(100% - 15px);
@@ -36,8 +39,9 @@
 
 .start_space_card_item {
   border-radius: 10px;
-  background: url("../../../public/slide-bg.svg") repeat;
-  background-size: cover;
+  // background-color: aqua;
+  background: url("../../../public/main.jpeg") repeat;
+  background-size: contain;
   flex-shrink: 0;
   width: 750px;
   height: 100%;
