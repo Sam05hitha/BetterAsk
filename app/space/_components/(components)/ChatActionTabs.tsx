@@ -11,7 +11,7 @@ import { clearChat } from "@/app/_services/commonApis";
 
 interface ChatHeaderTypes {
   title: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 interface RecentItemsType {
