@@ -33,11 +33,11 @@ export function ChatTabItem({ clearChat, href, title }: RecentItemsType) {
     >
       <ChatBubbleOutlineOutlinedIcon className={style.chatTabItem_item_icon} />
       <span>{title}</span>
-      <button onClick={clearChat} className={style.chatTabItem_item_clear}>
+      {/* <button onClick={clearChat} className={style.chatTabItem_item_clear}>
         <DeleteOutlineOutlinedIcon
           className={style.chatTabItem_item_clear_icon}
         />
-      </button>
+      </button> */}
     </Link>
   );
 }
