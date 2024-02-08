@@ -125,7 +125,7 @@ export default function StartSpaceCard() {
         shadow={false}
         custom="bg-transparent"
         loading={loadingQuery}
-        placeHolder="Ask me anything about Interior designs"
+        placeHolder="Ask me anything about Prolance"
         handleOnChange={handleStartChatInput}
         handleOnSubmit={handleStartChatSubmit}
         value={startChatInputValue}
