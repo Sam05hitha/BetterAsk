@@ -1,14 +1,9 @@
 import React from "react";
 import style from "./create_space.module.scss";
-import { Button } from "@/app/_components";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { CreateSpaceFooter, ManageDocuments, ManageUsers } from ".";
-import { useRouter } from "next/navigation";
 
 export default function page() {
-
-  // TODO: add error boundary 
-  
+  // TODO: add error boundary
 
   return (
     <section className={`bg-white ${style.create_space_page_container}`}>
@@ -22,7 +17,7 @@ export default function page() {
           <ManageUsers />
         </div>
 
-        <CreateSpaceFooter  />
+        <CreateSpaceFooter />
       </div>
     </section>
   );

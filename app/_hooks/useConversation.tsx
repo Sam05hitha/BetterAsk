@@ -1,14 +1,8 @@
-import { getQueryApi } from "../_services/getUsers";
 import { useContext, useEffect, useState } from "react";
 import { TConversation } from "../_utils/types";
 import { getConversations } from "../_services/getConversation";
 import { getCookie } from "../_utils/methods";
 import { AppContext } from "../_context/appContext";
-
-const fetcher = async (url: string) => {
-  const response = await getQueryApi.get(url);
-  return response.data?.conversation_chain;
-};
 
 export default function useConversation(session_id: string | null) {
   const [data, setData] = useState<TConversation[]>([]);
@@ -42,6 +36,7 @@ export default function useConversation(session_id: string | null) {
 
   useEffect(() => {
     refreshConversations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session_id]);
 
   return {

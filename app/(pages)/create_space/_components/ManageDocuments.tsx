@@ -11,7 +11,6 @@ export default function ManageDocuments() {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const dragRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState<boolean>(false);
-  const [droppedFiles, setDroppedFiles] = useState<any[]>([]);
 
   function handleOnChildElement() {
     if (dragRef.current) {

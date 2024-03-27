@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geologica } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "./_components";
+// import { Navbar } from "./_components";
 import AppWrap from "./_context/AppWrap";
 
 const geo = Geologica({

@@ -2,15 +2,11 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import style from "./space.module.scss";
-import { ChatContainer, ChatInput, SpaceHeading } from "../_components";
+import { ChatContainer, ChatInput } from "../_components";
 import useConversation from "@/app/_hooks/useConversation";
 import useSendQuery from "@/app/_hooks/useSendQuery";
 import { TConversation } from "@/app/_utils/types";
-import {
-  formatTimestampTo24Hour,
-  handleScrollIntoView,
-  newPendingMessage,
-} from "@/app/_utils/methods";
+import { handleScrollIntoView, newPendingMessage } from "@/app/_utils/methods";
 
 interface INewChatModel {
   searchParams?: { chatStartInput: string | undefined | null };
@@ -21,10 +17,8 @@ export default function SpaceWithID({ params }: INewChatModel) {
   const [currentMessage, setCurrentMassage] = useState<string>("");
   const spacePageRef = useRef<HTMLDivElement | null>(null);
 
-  const { conversations, isLoading, isError, refresh } = useConversation(
-    params.spaceId
-  );
-  const { response, error, getInputQuery, loadingQuery } = useSendQuery();
+  const { conversations, refresh } = useConversation(params.spaceId);
+  const { response, getInputQuery, loadingQuery } = useSendQuery();
 
   const [conversationsData, setConversationsData] =
     useState<TConversation[]>(conversations);
@@ -51,6 +45,7 @@ export default function SpaceWithID({ params }: INewChatModel) {
     if (response) {
       refresh();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response]);
 
   useEffect(() => {

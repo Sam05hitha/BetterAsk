@@ -3,16 +3,16 @@
 import React, { useContext, useState } from "react";
 import style from "../_styles/chatAction.module.scss";
 import { Recent, TopSpaces } from "..";
-import { useRouter } from "next/navigation";
-import { ActionButtons, Feedback, ToolTip } from "@/app/_components";
+// import { useRouter } from "next/navigation";
+import { Feedback, ToolTip } from "@/app/_components";
 import useTooltip from "@/app/_hooks/useTooltip";
-import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
+// import SignalCellularAlt1BarRoundedIcon from "@mui/icons-material/SignalCellularAlt1BarRounded";
 import { getCookie } from "@/app/_utils/methods";
 import { clearChat } from "@/app/_services/commonApis";
 import { AppContext } from "@/app/_context/appContext";
 
 export default function ChatAction() {
-  const router = useRouter();
+  // const router = useRouter();
   const {
     appState: { conversations },
   } = useContext(AppContext);
@@ -24,15 +24,14 @@ export default function ChatAction() {
     setCollapse((prev) => !prev);
   }
 
-  function handleGoBack() {
-    router.back();
-  }
-  
+  // function handleGoBack() {
+  //   router.back();
+  // }
 
-  function handleCreateSpace() {
-    // TODO create new chat channel
-    router.push("/space/new_chat_model");
-  }
+  // function handleCreateSpace() {
+  //   // TODO create new chat channel
+  //   router.push("/space/new_chat_model");
+  // }
 
   async function handleClearChat() {
     const session_id = getCookie();

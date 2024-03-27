@@ -7,9 +7,9 @@ interface IListAdded {
   documents?: undefined | true;
 }
 
-export default function ListAdded({ users, documents }: IListAdded) {
+export default function ListAdded({ users }: IListAdded) {
   const sectionClass = users ? style.list_user_container : style.list_container;
-  
+
   return (
     <ul className={sectionClass}>
       <ListItem />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { getQuery } from "../_services/getUsers";
 import { getCookie } from "../_utils/methods";
 

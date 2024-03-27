@@ -26,10 +26,6 @@ import useSendQuery from "@/app/_hooks/useSendQuery";
 //   },
 // ];
 
-interface ISlide {
-  slideId: number;
-}
-
 export default function StartSpaceCard() {
   // const [slide, setSlide] = useState<ISlide>({
   //   slideId: 0,
@@ -85,6 +81,7 @@ export default function StartSpaceCard() {
         router.push(`/space/${session_id}`);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response]);
 
   return (

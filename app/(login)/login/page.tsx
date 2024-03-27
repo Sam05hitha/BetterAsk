@@ -1,6 +1,5 @@
 "use client";
 
-import style from "./login.module.scss";
 import { LoginForm } from "../../_components";
 import { TLogin, TOnChange, TOnSubmit } from "@/app/_utils/types";
 import appAuth from "../appAuth";

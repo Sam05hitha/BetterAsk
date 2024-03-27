@@ -5,9 +5,9 @@ import style from "../_styles/chatActionTabs.module.scss";
 import Link from "next/link";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import { usePathname } from "next/navigation";
-import { extractIdFromPath, getCookie } from "@/app/_utils/methods";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import { clearChat } from "@/app/_services/commonApis";
+import { extractIdFromPath } from "@/app/_utils/methods";
+// import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+// import { clearChat } from "@/app/_services/commonApis";
 
 interface ChatHeaderTypes {
   title: string;
@@ -20,7 +20,7 @@ interface RecentItemsType {
   clearChat: () => void;
 }
 
-export function ChatTabItem({ clearChat, href, title }: RecentItemsType) {
+export function ChatTabItem({ href, title }: RecentItemsType) {
   const pathname = usePathname();
 
   const isActivePath = extractIdFromPath(pathname) === extractIdFromPath(href);

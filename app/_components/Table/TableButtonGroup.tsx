@@ -21,7 +21,6 @@ type TButtonConfig = {
 
 export default function TableButtonGroup({
   spaces,
-  users,
   documents,
   onRemove,
   onChat,

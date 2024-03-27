@@ -1,7 +1,6 @@
 import Link from "next/link";
 import React from "react";
 import style from "./navbar.module.scss";
-import { usePathname } from "next/navigation";
 import NavProfile from "./NavProfile";
 
 const links = [
@@ -11,8 +10,6 @@ const links = [
 ];
 
 export default function SmLinks() {
-  const pathname = usePathname();
-
   return (
     <div className={`${style.sml_links_container} font-geo`}>
       {links.map((item) => (

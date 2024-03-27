@@ -1,4 +1,3 @@
-import { type } from "os";
 import { ChangeEvent, FormEvent } from "react";
 
 export type TUser = {

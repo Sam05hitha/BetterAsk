@@ -2,16 +2,15 @@
 
 import React, { useState } from "react";
 import style from "../[spaceId]/space.module.scss";
-import { ChatContainer, ChatInput, SpaceHeading } from "../_components";
+import { ChatContainer, ChatInput } from "../_components";
 
-
-interface INewChatModel {
-  searchParams: { chatStartInput: string | undefined | null };
-}
+// interface INewChatModel {
+//   searchParams: { chatStartInput: string | undefined | null };
+// }
 
 const data: any = [];
 
-export default function NewChatModel({ searchParams }: INewChatModel) {
+export default function NewChatModel() {
   const [currentMessage, setCurrentMassage] = useState<string>("");
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {

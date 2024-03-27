@@ -1,5 +1,4 @@
 import React from "react";
-import style from "./navbar.module.scss";
 import { Button } from "..";
 
 type TLogGroup = {
