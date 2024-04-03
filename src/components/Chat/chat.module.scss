@@ -1,0 +1,153 @@
+@import "../../styles/abstract/mixins";
+@import "../../styles/abstract/variables";
+
+.message_container {
+  font-size: $font-sm;
+  margin-bottom: 10px;
+  width: max-content;
+  max-width: 800px;
+}
+
+.message_container_isUser {
+  align-self: flex-end;
+}
+
+.message_time {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  height: 30px;
+  margin-bottom: 5px;
+
+  span {
+    display: block;
+    margin-left: auto;
+  }
+
+  > div {
+    font-size: $font-medium;
+    font-weight: bolder;
+    background-color: black;
+    color: white;
+    padding: 0 5px;
+    margin: 0 auto 0 0;
+  }
+}
+
+.message_body {
+  padding: 20px 25px;
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border: 2px solid lightgray;
+}
+
+.message_avatar {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  margin-right: 15px;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.message_avatar_isUser {
+  background-color: lightgray;
+}
+
+.message_text {
+  font-size: $font-medium;
+  line-height: 2;
+  color: hsla(0, 0%, 0%, 0.8);
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin-bottom: 16px;
+  }
+  ul,
+  ol {
+    margin-bottom: 16px;
+    margin-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: hsla(0, 0%, 0%, 07);
+  }
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  p {
+    margin-bottom: 16px;
+  }
+
+  :not(pre) > code {
+    background-color: #f7f7f7;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+  }
+}
+
+.message_footer {
+  padding: 5px 10px;
+  button {
+    color: black;
+    transition: color 0.3s;
+
+    svg {
+      transform: scale(0.8);
+    }
+
+    &:active {
+      & svg {
+      }
+    }
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
+}
+
+.message_isGenerating {
+  position: relative;
+  padding-top: 5px;
+  width: 40px;
+}
+
+.remark_textbox_container {
+  width: 100%;
+  margin: 20px 0 20px;
+  padding-top: 20px;
+  border-top: 1px solid lightgray;
+
+  span {
+    font-size: $font-medium;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  textarea {
+    @include input_base;
+  }
+}

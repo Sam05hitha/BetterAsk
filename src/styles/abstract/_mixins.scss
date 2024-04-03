@@ -1,0 +1,113 @@
+@import "./variables";
+
+@font-face {
+  font-family: "Averta CY W01";
+  src: url("../../fonts//Averta\ CY\ W01\ Bold.woff") format("woff"),
+    url("../../fonts/Averta\ CY\ W01\ Bold.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@mixin input_base {
+  border-radius: 8px;
+  border: none;
+  background: #fff;
+  width: 100%;
+
+  &::placeholder {
+    font-size: $font-sm;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@mixin flex_container($align, $justify, $gap, $direction) {
+  display: flex;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+  flex-direction: $direction;
+}
+@mixin button_base($bg, $color) {
+  font-weight: 700;
+  transition: 0.1s;
+  border: none;
+  background: $bg;
+  color: $color;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: none;
+  &:active {
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.2);
+  }
+  &:disabled {
+    filter: opacity(50%);
+    user-select: none;
+    cursor: not-allowed;
+  }
+}
+
+@mixin rotate($time) {
+  animation: rotate $time linear infinite;
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@mixin m-desktop {
+  @media only screen and (min-width: 1201px) {
+    @content;
+  }
+}
+
+@mixin l-desktop {
+  @media only screen and (min-width: 1201px) and (max-width: 1400px) {
+    @content;
+  }
+}
+
+@mixin xl-desktop {
+  @media only screen and (min-width: 1401px) and (max-width: 1600px) {
+    @content;
+  }
+}
+
+@mixin xxl-desktop {
+  @media only screen and (min-width: 1601px) {
+    @content;
+  }
+}
+
+@mixin sidebar {
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    position: absolute;
+    right: 0;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: white;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 15px;
+    -webkit-box-shadow: none;
+    background: transparent;
+    box-shadow: none;
+  }
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background-color: #b7bfc9;
+    }
+  }
+}
