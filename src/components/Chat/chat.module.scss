@@ -6,6 +6,10 @@
   margin-bottom: 10px;
   width: max-content;
   max-width: 800px;
+
+  @include tablet {
+    width: auto;
+  }
 }
 
 .message_container_isUser {

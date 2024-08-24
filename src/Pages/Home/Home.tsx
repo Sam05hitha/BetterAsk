@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import style from "./home.module.scss";
 import useSendQuery from "../../hooks/useSendQuery";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/taxlabs_logo.png";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import HourglassBottomRoundedIcon from "@mui/icons-material/HourglassBottomRounded";
 import { Tooltip } from "@mui/material";
@@ -19,17 +19,23 @@ export default function Home() {
   }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    localStorageProvider.save({
-      session_id: generateRandomId(10),
-    });
-
     const formData = new FormData(event.currentTarget);
     const input = formData.get("prompt") as string;
-    if (input) {
-      queryMutate({ query: input });
+    event.preventDefault();
+
+    if (!input) {
+      return;
     }
+    const local = localStorageProvider.getStorage();
+    if (!local || !local.session_id) {
+      localStorageProvider.save({
+        session_id: generateRandomId(10),
+      });
+    }
+
+    queryMutate({ query: input });
+    const text = document.getElementById("prompt") as HTMLInputElement;
+    if (text) text.value = "";
   }
 
   return (
@@ -44,8 +50,11 @@ export default function Home() {
             placeholder="Ask me anything about VAT"
             type="text"
             name="prompt"
+            id="prompt"
           />
-          <Tooltip title="send">
+          <Tooltip
+            title={queryStatus === "pending" ? "Getting response" : "send"}
+          >
             <button type="submit">
               {queryStatus === "pending" ? (
                 <HourglassBottomRoundedIcon

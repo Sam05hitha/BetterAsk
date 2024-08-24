@@ -36,6 +36,10 @@
       max-width: 660px;
       border: 2px solid black;
 
+      @include tablet {
+        min-width: 100%;
+      }
+
       > input {
         @include input_base;
       }

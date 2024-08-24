@@ -25,6 +25,8 @@ export default function Chat() {
       mutateData(input);
       queryMutate({ query: input });
     }
+    const text = document.getElementById("prompt") as HTMLInputElement;
+    if (text) text.value = "";
   }
 
   return (
@@ -43,8 +45,12 @@ export default function Chat() {
               placeholder="Ask me anything about VAT..."
               type="text"
               name="prompt"
+              id="prompt"
             />
-            <Tooltip title="Send" placement="top">
+            <Tooltip
+              title={queryStatus === "pending" ? "Getting response" : "send"}
+              placement="top"
+            >
               <button type="submit">
                 {queryStatus === "pending" ? (
                   <HourglassBottomRoundedIcon

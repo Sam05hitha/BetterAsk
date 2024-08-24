@@ -1,5 +1,7 @@
 @import "./variables";
 
+$breakpoint-tablet: 768px;
+
 @font-face {
   font-family: "Averta CY W01";
   src: url("../../fonts//Averta\ CY\ W01\ Bold.woff") format("woff"),
@@ -109,5 +111,11 @@
     &::-webkit-scrollbar-thumb {
       background-color: #b7bfc9;
     }
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-tablet) {
+    @content;
   }
 }

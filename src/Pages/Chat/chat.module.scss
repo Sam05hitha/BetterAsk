@@ -35,6 +35,10 @@
     align-items: center;
     padding: 0 50px;
 
+    @include tablet {
+      padding: 0 30px;
+    }
+
     .c_input {
       display: flex;
       align-items: center;
@@ -69,6 +73,10 @@
   overflow-y: auto;
   @include sidebar;
   padding: 0 50px;
+
+  @include tablet {
+    padding: 0 10px;
+  }
 }
 
 .message_container_couple {
