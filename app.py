@@ -1,0 +1,396 @@
+from fastapi import FastAPI, HTTPException, Depends
+from dotenv import load_dotenv
+from PyPDF2 import PdfReader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
+import os
+import psycopg2
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
+
+context = """
+Context: A software tool designed for cabinet and wardrobe customization, enabling users to modify accessories, materials, and colors, and generate detailed layouts and quotes.
+Example: Customizing the exposed side of a panel involves selecting the cabinet, then changing the panel color by selecting the exposed panel color option.
+Core Question: How can one efficiently customize and manage cabinet and wardrobe designs using the described software tool?
+Factors considered include the tool's capabilities for individual and batch customization of components, generation of 2D layouts and elevation views, adjustment of component dimensions and styles, application of global settings for materials and styles, detailed customization options (e.g., edge bending, mirror placements), efficient modifications through batch styles, management of project paths and hardware settings, and the calculation of pricing and margins for quotations. These functionalities are crucial for streamlining the design process, enhancing design flexibility, and managing design projects effectively.
+"""
+
+prompt_template = """ 
+Hey !! I am BetterAsk, you are capable of asking questions related to UAE VAT Law. 
+The following is a friendly conversation between a human and an AI. 
+
+{context}
+
+Question: {question}
+Answer:
+"""
+PROMPT = PromptTemplate(
+    template=prompt_template, input_variables=["context", "question"]
+)
+
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the OpenAI API key from the environment variables
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("POSTGRES_HOST")
+DB_PORT = os.getenv("POSTGRES_PORT")
+DB_DB = os.getenv("POSTGRES_DB")
+
+# PostgreSQL connection settings
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DB}"
+
+global_context_limit = 6
+
+# Create a connection to the DBQL database
+conn = psycopg2.connect(DATABASE_URL, sslmode="prefer")
+
+# Create a cursor object to interact with the database
+cursor = conn.cursor()
+
+# FastAPI application
+app = FastAPI()
+
+# Enable CORS (Cross-Origin Resource Sharing)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (change this in production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+
+class ChatSession:
+    def __init__(self):
+        self.conversation = None
+        self.chat_history = []
+        self.current_context = 0
+        self.text_chunks = None
+
+
+# A global chat session.
+# Replace with a suitable data structure (like a dict) for multiple sessions
+global_chat_session = ChatSession()
+
+
+async def get_conversation(query):
+    if global_chat_session.conversation is None:
+        raise HTTPException(status_code=400, detail="No documents processed yet")
+    return global_chat_session.conversation({"question": query})
+
+
+def get_chat_session():
+    return ChatSession()
+
+
+# Dependency to get the database cursor
+async def get_db_cursor():
+    db = psycopg2.connect(DATABASE_URL, sslmode="prefer")
+    cursor = db.cursor()
+    try:
+        yield cursor
+    finally:
+        cursor.close()
+        db.close()
+
+
+def get_or_create_user_id(session_id):
+
+    # Check if the user exists in the 'users' table
+    check_user_query = "SELECT id FROM users WHERE session_id = %s;"
+    cursor.execute(check_user_query, (session_id,))
+    user_result = cursor.fetchone()
+
+    # If the user doesn't exist, create a new user
+    if user_result is None:
+        create_user_query = "INSERT INTO users (session_id) VALUES (%s) RETURNING id;"
+        cursor.execute(create_user_query, (session_id,))
+        user_id = cursor.fetchone()[0]
+        conn.commit()
+    else:
+        user_id = user_result[0]
+
+    return user_id
+
+
+def get_pdf_text(pdf_files):
+    # Code to read text from PDF
+    text = ""
+    for pdf_file in pdf_files:
+
+        print("Reading file: ", pdf_file)
+
+        with open(os.path.join("posh-docs", pdf_file), "rb") as file:
+            pdf_reader = PdfReader(file)
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+
+    return text
+
+
+def get_text_chunks(raw_text):
+    # Code to split the text into chunks
+    text_splitter = CharacterTextSplitter(
+        separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len
+    )
+    chunks = text_splitter.split_text(raw_text)
+    return chunks
+
+
+def get_vectorstore(text_chunks):
+    # Code to get the vectorstore
+    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+
+    global_chat_session.current_context = 0
+
+    return vectorstore
+
+
+def get_conversation_chain(vectorstore):
+    # Code to get the conversation chain
+    llm = OpenAI(
+        model="gpt-4-turbo-preview", openai_api_key=OPENAI_API_KEY, temperature=0
+    )
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
+    conversation_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=vectorstore.as_retriever(),
+        memory=memory,
+        combine_docs_chain_kwargs={"prompt": PROMPT},
+    )
+
+    print(
+        conversation_chain,
+    )
+
+    return conversation_chain
+
+
+@app.post("/process-documents")
+async def process_documents():
+
+    # Code to process the documents
+    if global_chat_session.current_context < global_context_limit:
+        raw_text = get_pdf_text(os.listdir("posh-docs"))
+        global_chat_session.text_chunks = get_text_chunks(raw_text)
+
+    vectorstore = get_vectorstore(global_chat_session.text_chunks)
+
+    # Set the global_chat_session.conversation after processing documents
+    global_chat_session.conversation = get_conversation_chain(vectorstore)
+
+    return {
+        "message": "Documents processed. Start asking questions using /chat/<query>"
+    }
+
+
+class UserSession(BaseModel):
+    session_id: str
+
+
+@app.post("/get-conversation-history")
+async def get_user_conversation_history(
+    session: UserSession, _: psycopg2.extensions.cursor = Depends(get_db_cursor)
+):
+
+    session_id = session.session_id
+
+    user_id = get_or_create_user_id(session_id)
+
+    # Retrieve the conversation history for a specific user from the database
+    select_query = "SELECT user_query, assistant_response, user_id, timestamp, id FROM user_conversation_history WHERE user_id = %s;"
+    cursor.execute(select_query, (user_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append(
+            {
+                "query": row[0],
+                "answer": row[1],
+                "user_id": row[2],
+                "timestamp": row[3],
+                "converstaion_id": row[4],
+            }
+        )
+
+    return {"conversation_chain": conversation_chain}
+
+
+class ChatRequest(BaseModel):
+    query: str
+    session_id: str
+
+
+@app.post("/chat")
+async def chat(
+    request: ChatRequest,
+    conversation_id: int = None,
+    _: ChatSession = Depends(get_chat_session),
+):
+
+    if global_chat_session.current_context >= global_context_limit:
+        await process_documents()
+
+    global_chat_session.current_context += 1
+
+    session_id = request.session_id
+    query = request.query
+
+    if session_id is None:
+        raise HTTPException(status_code=400, detail="session_id is required")
+
+    user_id = get_or_create_user_id(session_id)
+
+    if conversation_id is None:
+        # If conversation_id is not provided, generate a new one
+        insert_query = "INSERT INTO user_conversation_history (user_id, user_query, assistant_response) VALUES (%s, %s, %s) RETURNING id;"
+        cursor.execute(insert_query, (user_id, query, ""))
+        conversation_id = cursor.fetchone()[0]
+        conn.commit()
+
+    # Retrieve the conversation history from the database
+    select_query = "SELECT user_query, assistant_response FROM user_conversation_history WHERE id = %s;"
+    cursor.execute(select_query, (conversation_id,))
+    history = cursor.fetchall()
+
+    # Reconstruct the conversation chain
+    conversation_chain = []
+    for row in history:
+        conversation_chain.append(
+            {
+                "user_id": user_id,
+                "converstaion_id": conversation_id,
+                "query": row[0],
+                "answer": row[1],
+            }
+        )
+
+    # Call the `get_conversation` method of the chat session
+    response = await get_conversation(query)
+
+    # Insert the new response into the database
+    update_query = (
+        "UPDATE user_conversation_history SET assistant_response = %s WHERE id = %s;"
+    )
+    cursor.execute(update_query, (response["answer"], conversation_id))
+    conn.commit()
+
+    return {
+        "answer": response["answer"],
+        "conversation_id": conversation_id,
+        "user_id": user_id,
+    }
+
+
+class ClearChatRequest(BaseModel):
+    session_id: str
+
+
+@app.post("/clear-chat")
+async def clear_chat(
+    request: ClearChatRequest, db: psycopg2.extensions.cursor = Depends(get_db_cursor)
+):
+
+    session_id = request.session_id
+
+    new_session_id = "D-" + session_id + "-D"
+
+    # Clear the conversation history for the specified user
+    clear_query = "UPDATE users SET session_id = %s WHERE session_id = %s;"
+
+    print(clear_query)
+
+    db.execute(
+        clear_query,
+        (
+            new_session_id,
+            session_id,
+        ),
+    )
+    conn.commit()
+
+    return {"message": "Conversation history cleared successfully."}
+
+
+class UserFeedback(BaseModel):
+    session_id: str
+    user_feedback: str
+
+
+@app.post("/feedback")
+async def submit_user_feedback(
+    feedback: UserFeedback, db: psycopg2.extensions.cursor = Depends(get_db_cursor)
+):
+    user_id = get_or_create_user_id(feedback.session_id)
+
+    # Insert user feedback into the database
+    insert_query = "INSERT INTO user_feedback (user_id, feedback_id, user_feedback) VALUES (%s, DEFAULT, %s) RETURNING id;"
+    db.execute(insert_query, (user_id, feedback.user_feedback))
+    feedback_id = db.fetchone()[0]
+    conn.commit()
+
+    return {
+        "message": "User feedback submitted successfully.",
+        "feedback_id": feedback_id,
+    }
+
+
+class UserResponseFeedback(BaseModel):
+    session_id: str
+    conversation_id: int
+    like_dislike: bool
+    response_feedback: str
+
+
+@app.post("/response-feedback")
+async def submit_user_response_feedback(
+    response_feedback: UserResponseFeedback,
+    db: psycopg2.extensions.cursor = Depends(get_db_cursor),
+):
+    user_id = get_or_create_user_id(response_feedback.session_id)
+
+    # Insert user response feedback into the database
+    insert_query = "INSERT INTO user_response_feedback (user_id, conversation_id, response_feedback_id, like_dislike, response_feedback) VALUES (%s, %s, DEFAULT, %s, %s) RETURNING id;"
+    db.execute(
+        insert_query,
+        (
+            user_id,
+            response_feedback.conversation_id,
+            response_feedback.like_dislike,
+            response_feedback.response_feedback,
+        ),
+    )
+    response_feedback_id = db.fetchone()[0]
+    conn.commit()
+
+    return {
+        "message": "User response feedback submitted successfully.",
+        "response_feedback_id": response_feedback_id,
+    }
+
+
+if __name__ == "__main__":
+
+    async def startup():
+        print("Starting up...")
+        await process_documents()
+
+    app.add_event_handler("startup", startup)
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

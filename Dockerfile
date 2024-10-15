@@ -11,5 +11,7 @@ RUN pip install -r req.txt
 # Bundle app source
 COPY . /app
 
-# EXPOSE 8501
-CMD [ "streamlit", "run", "webbie_chat.py" ]
+EXPOSE 8000
+
+CMD [ "python", "app.py" ]
+
